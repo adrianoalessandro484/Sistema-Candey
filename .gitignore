@@ -35,6 +35,7 @@ pnpm-debug.log*
 
 # Documentacion local
 documents/
+REQUERIMIENTOS.md
 
 # Instrucciones de IA
 AGENTS.md
