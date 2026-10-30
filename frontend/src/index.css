@@ -1,0 +1,263 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
+
+@theme {
+  /* Identidad Candey */
+  --color-candey: #d63662;
+  --color-candey-dark: #b02a4f;
+  --color-candey-deep: #8f1e3e;
+  --color-candey-light: #f7d7e1;
+  --color-candey-100: #fbe3ea;
+  --color-candey-50: #fdf1f5;
+
+  /* Secundario: vino (sidebar y cabeceras) */
+  --color-wine: #3a1122;
+  --color-wine-dark: #260a16;
+  --color-wine-light: #4c1b2e;
+
+  /* Acento: dorado champagne (detalles y badges) */
+  --color-gold: #c9a24b;
+  --color-gold-dark: #a9853a;
+  --color-gold-light: #f3e6c4;
+  --color-gold-50: #fbf5e6;
+
+  /* Superficies y texto */
+  --color-canvas: #f7f4f3;
+  --color-surface: #ffffff;
+  --color-surface-2: #fbf9f8;
+  --color-line: #ebe5e3;
+  --color-line-strong: #d9cfcc;
+  --color-ink: #1b1418;
+  --color-body: #3a3035;
+  --color-muted: #75686d;
+
+  /* Estados */
+  --color-ok: #1f8a55;
+  --color-ok-bg: #e8f6ee;
+  --color-warn: #a86c0a;
+  --color-warn-bg: #fdf3e1;
+  --color-danger: #c9364a;
+  --color-danger-bg: #fdecef;
+  --color-info: #2f62c9;
+  --color-info-bg: #eaf0fd;
+
+  /* Layout */
+  --sidebar-w: 276px;
+  --shadow-card: 0 1px 2px rgba(27, 20, 24, 0.04), 0 18px 40px -28px rgba(58, 17, 34, 0.28);
+  --shadow-float: 0 28px 70px -32px rgba(38, 10, 22, 0.45);
+  --shadow-brand: 0 14px 30px -14px rgba(214, 54, 98, 0.55);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-canvas);
+    background-image:
+      radial-gradient(circle at 8% -8%, rgba(214, 54, 98, 0.11), transparent 40%),
+      radial-gradient(circle at 98% 0%, rgba(201, 162, 75, 0.14), transparent 36%);
+    background-attachment: fixed;
+    color: var(--color-body);
+    font-family: 'Geist Variable', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-ink);
+    font-weight: 700;
+    letter-spacing: -0.018em;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-candey) 22%, transparent);
+    color: var(--color-ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+    background-color: color-mix(in srgb, var(--color-wine) 24%, transparent);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  :focus-visible {
+    outline: none;
+  }
+}
+
+@layer components {
+  .tarjeta {
+    border: 1px solid var(--color-line);
+    border-radius: 1.25rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .titulo-seccion {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .app {
+    min-height: 100%;
+  }
+
+  .brand-gradient {
+    background-image: linear-gradient(135deg, var(--color-candey) 0%, var(--color-candey-dark) 100%);
+  }
+
+  .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(26, 12, 19, 0.48);
+    backdrop-filter: blur(3px);
+    animation: candey-fade-in 160ms ease-out;
+  }
+
+  .dialog-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 51;
+    display: flex;
+    max-height: calc(100vh - 2rem);
+    width: calc(100% - 2rem);
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 1.5rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-float);
+    outline: none;
+    animation: candey-pop-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .confirm-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 51;
+    width: calc(100% - 2rem);
+    max-width: 30rem;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 1.5rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-float);
+    outline: none;
+    animation: candey-pop-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .table-shell {
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 1.25rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+@keyframes candey-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes candey-pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes candey-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes candey-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sonner: toasts de marca Candey */
+:root {
+  --normal-bg: #ffffff;
+  --normal-border: #ebe5e3;
+  --normal-text: #3a3035;
+  --success-bg: #e8f6ee;
+  --success-border: #b9e3ca;
+  --success-text: #166b41;
+  --error-bg: #fdecef;
+  --error-border: #f3bdc6;
+  --error-text: #a52a3b;
+  --warning-bg: #fdf3e1;
+  --warning-border: #edd6a6;
+  --warning-text: #8a5908;
+  --info-bg: #eaf0fd;
+  --info-border: #c3d4f7;
+  --info-text: #2753aa;
+}
+
+[data-sonner-toast][data-styled='true'] {
+  border-radius: 1rem !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 18px 40px -22px rgba(38, 10, 22, 0.35) !important;
+  font-family: 'Geist Variable', system-ui, sans-serif !important;
+  font-size: 14.5px !important;
+}
+
+[data-sonner-toast][data-styled='true'] [data-title] {
+  font-weight: 600 !important;
+}
+
+[data-sonner-toast][data-styled='true'] [data-description] {
+  font-size: 13px !important;
+  opacity: 0.8 !important;
+}

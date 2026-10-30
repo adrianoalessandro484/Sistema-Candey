@@ -1,0 +1,6 @@
+@SistemaCandeyInventario.API_HostAddress = http://localhost:5042
+
+GET {{SistemaCandeyInventario.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

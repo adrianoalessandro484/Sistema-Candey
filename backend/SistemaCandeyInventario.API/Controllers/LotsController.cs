@@ -1,0 +1,22 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SistemaCandeyInventario.Application.Interfaces;
+
+namespace SistemaCandeyInventario.API.Controllers;
+
+[ApiController]
+[Route("api/lotes")]
+[Authorize]
+public class LotsController : ControllerBase
+{
+    private readonly ILotService _service;
+
+    public LotsController(ILotService service)
+    {
+        _service = service;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAvailable([FromQuery] int productId, CancellationToken ct)
+        => Ok(await _service.GetAvailableByProductAsync(productId, ct));
+}

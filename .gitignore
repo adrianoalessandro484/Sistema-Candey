@@ -1,0 +1,44 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Build / salida
+dist/
+dist-ssr/
+build/
+out/
+
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Entorno
+*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.sw?
+
+# Documentacion local
+documents/
+
+# Instrucciones de IA
+AGENTS.md
+**/AGENTS.md
+
+# Scripts temporales
+frontend/tmp-*.mjs

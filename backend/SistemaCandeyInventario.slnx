@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SistemaCandeyInventario.API/SistemaCandeyInventario.API.csproj" />
+  <Project Path="SistemaCandeyInventario.Application/SistemaCandeyInventario.Application.csproj" />
+  <Project Path="SistemaCandeyInventario.Domain/SistemaCandeyInventario.Domain.csproj" />
+  <Project Path="SistemaCandeyInventario.Infrastructure/SistemaCandeyInventario.Infrastructure.csproj" />
+</Solution>
