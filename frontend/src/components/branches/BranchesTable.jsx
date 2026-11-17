@@ -68,7 +68,7 @@ export default function BranchesTable({ branches, onEdit, onChangeStatus, onDele
         cell: ({ row }) => {
           const branch = row.original
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(branch)}>
                 <Pencil size={16} />
               </IconButton>

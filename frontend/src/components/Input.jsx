@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import Field, { controlClasses } from './Field.jsx'
+import Field from './Field.jsx'
+import { controlClasses } from './fieldStyles.js'
 
 const Input = forwardRef(function Input(
   {
@@ -24,8 +25,8 @@ const Input = forwardRef(function Input(
     <Field id={id} label={label} error={error} hint={hint} required={required} className={className}>
       <div className="relative">
         {hasIcon ? (
-          <span className="pointer-events-none absolute inset-y-0 left-0 flex w-11 items-center justify-center text-muted">
-            <Icon size={18} aria-hidden="true" />
+          <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-muted">
+            <Icon size={19} aria-hidden="true" />
           </span>
         ) : null}
 
@@ -37,13 +38,13 @@ const Input = forwardRef(function Input(
           aria-describedby={error ? `${id}-error` : undefined}
           className={controlClasses(
             Boolean(error),
-            `h-12 px-4 ${hasIcon ? 'pl-11' : ''} ${hasTrailing ? 'pr-12' : ''} ${controlClassName}`,
+            `h-[52px] px-4 ${hasIcon ? 'pl-12' : ''} ${hasTrailing ? 'pr-13' : ''} ${controlClassName}`,
           )}
           {...rest}
         />
 
         {hasTrailing ? (
-          <span className="absolute inset-y-0 right-0 flex w-12 items-center justify-center">
+          <span className="absolute inset-y-0 right-0 flex w-13 items-center justify-center">
             {trailing}
           </span>
         ) : null}

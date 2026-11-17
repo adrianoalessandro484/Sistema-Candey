@@ -33,3 +33,38 @@ export function formatShortDate(value) {
     year: 'numeric',
   }).format(date)
 }
+
+export function formatDateTime(value) {
+  if (!value) return '-'
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
+export function hoursSince(value) {
+  if (!value) return 0
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return 0
+  return Math.max((Date.now() - date.getTime()) / (1000 * 60 * 60), 0)
+}
+
+export function formatRelativeAge(value) {
+  if (!value) return '-'
+  const hours = hoursSince(value)
+  if (hours < 1) {
+    const minutes = Math.max(Math.round(hours * 60), 1)
+    return `hace ${minutes} min`
+  }
+  if (hours < 24) {
+    const whole = Math.floor(hours)
+    return `hace ${whole} h`
+  }
+  const days = Math.floor(hours / 24)
+  return `hace ${days} ${days === 1 ? 'día' : 'días'}`
+}

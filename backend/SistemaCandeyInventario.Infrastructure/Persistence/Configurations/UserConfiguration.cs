@@ -39,6 +39,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(true)
             .IsRequired();
 
+        builder.Property(u => u.BranchId)
+            .HasColumnName("cod_sucursal");
+
         builder.Property(u => u.CreatedAt)
             .HasColumnName("fec_creacion")
             .IsRequired();
@@ -50,5 +53,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("est_registro")
             .HasDefaultValue(true)
             .IsRequired();
+
+        builder.HasOne(u => u.Branch)
+            .WithMany()
+            .HasForeignKey(u => u.BranchId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,4 +1,5 @@
-﻿using SistemaCandeyInventario.Application.Common.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaCandeyInventario.Application.Common.Exceptions;
 using SistemaCandeyInventario.Application.Common.Interfaces;
 using SistemaCandeyInventario.Application.DTOs.Common;
 using SistemaCandeyInventario.Application.DTOs.Users;
@@ -15,11 +16,13 @@ public class UserService : IUserService
 
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IAppDbContext _context;
 
-    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, IAppDbContext context)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _context = context;
     }
 
     public async Task<List<UserResponse>> GetAllAsync(CancellationToken ct = default)
@@ -38,7 +41,8 @@ public class UserService : IUserService
             users = users
                 .Where(user =>
                     user.Name.ToLowerInvariant().Contains(term) ||
-                    user.Role.ToString().ToLowerInvariant().Contains(term))
+                    user.Role.ToString().ToLowerInvariant().Contains(term) ||
+                    (user.Branch != null && user.Branch.Name.ToLowerInvariant().Contains(term)))
                 .ToList();
         }
 
@@ -74,6 +78,7 @@ public class UserService : IUserService
         ValidatePassword(request.Password, required: true);
         ValidateRole(request.Role);
 
+        var branchId = await ResolveBranchIdAsync(request.Role, request.BranchId, ct);
         var userName = request.UserName.Trim();
 
         if (await _userRepository.ExistsUserNameAsync(userName, null, ct))
@@ -86,14 +91,16 @@ public class UserService : IUserService
             Name = userName,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = request.Role,
+            BranchId = branchId,
             HasAccess = true,
             CreatedAt = DateTime.UtcNow,
             IsRegistered = true
         };
 
         user.UserId = await _userRepository.CreateAsync(user, ct);
+        var created = await _userRepository.GetByIdAsync(user.UserId, ct) ?? user;
 
-        return Map(user);
+        return Map(created);
     }
 
     public async Task<UserResponse> UpdateAsync(int id, UpdateUserRequest request, CancellationToken ct = default)
@@ -113,9 +120,11 @@ public class UserService : IUserService
         }
 
         await EnsureAdministratorRemainsAsync(user, request.Role, ct);
+        var branchId = await ResolveBranchIdAsync(request.Role, request.BranchId, ct);
 
         user.Name = userName;
         user.Role = request.Role;
+        user.BranchId = branchId;
         user.UpdatedAt = DateTime.UtcNow;
 
         if (!string.IsNullOrWhiteSpace(request.Password))
@@ -125,8 +134,9 @@ public class UserService : IUserService
         }
 
         await _userRepository.UpdateAsync(user, ct);
+        var updated = await _userRepository.GetByIdAsync(user.UserId, ct) ?? user;
 
-        return Map(user);
+        return Map(updated);
     }
 
     public async Task ChangeRoleAsync(int id, ChangeRoleRequest request, CancellationToken ct = default)
@@ -138,8 +148,10 @@ public class UserService : IUserService
             ?? throw new NotFoundException("El usuario no existe.");
 
         await EnsureAdministratorRemainsAsync(user, request.Role, ct);
+        var branchId = await ResolveBranchIdAsync(request.Role, request.BranchId, ct);
 
         user.Role = request.Role;
+        user.BranchId = branchId;
         user.UpdatedAt = DateTime.UtcNow;
 
         await _userRepository.UpdateAsync(user, ct);
@@ -180,6 +192,29 @@ public class UserService : IUserService
         }
 
         await _userRepository.DeleteAsync(user, ct);
+    }
+
+    private async Task<int?> ResolveBranchIdAsync(UserRole role, int? branchId, CancellationToken ct)
+    {
+        if (role != UserRole.BranchClerk)
+        {
+            return null;
+        }
+
+        if (!branchId.HasValue || branchId.Value <= 0)
+        {
+            throw new ValidationException("Seleccione la sucursal asignada para el encargado de sucursal.");
+        }
+
+        var exists = await _context.Branches
+            .AnyAsync(branch => branch.BranchId == branchId.Value && branch.IsRegistered && branch.IsActive, ct);
+
+        if (!exists)
+        {
+            throw new ValidationException("La sucursal seleccionada no existe o está inactiva.");
+        }
+
+        return branchId.Value;
     }
 
     private async Task EnsureAdministratorRemainsAsync(User user, UserRole newRole, CancellationToken ct)
@@ -247,8 +282,9 @@ public class UserService : IUserService
             UserName = user.Name,
             Role = user.Role.ToString(),
             HasAccess = user.HasAccess,
+            BranchId = user.BranchId,
+            BranchName = user.Branch?.Name,
             CreatedAt = user.CreatedAt
         };
     }
 }
-

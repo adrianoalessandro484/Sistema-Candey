@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Lock, UserRound } from 'lucide-react'
 import Modal from '../Modal.jsx'
@@ -10,21 +10,26 @@ import FormError from '../FormError.jsx'
 import { ROLES, roleLabel } from '../../utils/roles.js'
 import { createUserSchema, editUserSchema } from '../../schemas/userSchema.js'
 
-const EMPTY_USER = { userName: '', password: '', role: 'EntryClerk' }
+const EMPTY_USER = { userName: '', password: '', role: 'EntryClerk', branchId: '' }
 
-export default function UserFormModal({ open, mode, user, onClose, onSave }) {
+export default function UserFormModal({ open, mode, user, branches = [], onClose, onSave }) {
   const isEdit = mode === 'edit'
   const schema = isEdit ? editUserSchema : createUserSchema
   const {
     register,
+    control,
     handleSubmit,
     reset,
+    setValue,
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: EMPTY_USER,
   })
+
+  const selectedRole = useWatch({ control, name: 'role' })
+  const activeBranches = branches.filter((branch) => branch.active)
 
   useEffect(() => {
     if (!open) return
@@ -34,6 +39,7 @@ export default function UserFormModal({ open, mode, user, onClose, onSave }) {
         userName: user.userName,
         password: '',
         role: user.role,
+        branchId: user.branchId ? String(user.branchId) : '',
       })
     } else {
       reset(EMPTY_USER)
@@ -53,7 +59,7 @@ export default function UserFormModal({ open, mode, user, onClose, onSave }) {
       open={open}
       onClose={onClose}
       title={isEdit ? 'Editar usuario' : 'Nuevo usuario'}
-      description="Asigna un rol y acceso al personal del almacén."
+      description="Asigna un rol y acceso al personal del almacén o sucursales."
       icon={UserRound}
       footer={
         <>
@@ -75,7 +81,7 @@ export default function UserFormModal({ open, mode, user, onClose, onSave }) {
             label="Usuario"
             required
             icon={UserRound}
-            placeholder="Ej. admin"
+            placeholder="Ej. sucursal_norte"
             autoComplete="off"
             error={errors.userName?.message}
             {...register('userName')}
@@ -94,13 +100,43 @@ export default function UserFormModal({ open, mode, user, onClose, onSave }) {
             {...register('password')}
           />
 
-          <Select id="role" label="Rol" required error={errors.role?.message} {...register('role')}>
+          <Select
+            id="role"
+            label="Rol"
+            required
+            error={errors.role?.message}
+            {...register('role', {
+              onChange: (event) => {
+                if (event.target.value !== 'BranchClerk') {
+                  setValue('branchId', '')
+                }
+              },
+            })}
+          >
             {ROLES.map((role) => (
               <option key={role} value={role}>
                 {roleLabel(role)}
               </option>
             ))}
           </Select>
+
+          {selectedRole === 'BranchClerk' ? (
+            <Select
+              id="branchId"
+              label="Sucursal asignada"
+              required
+              hint="Este usuario solo podrá enviar requerimientos y confirmar recepciones de esta sucursal."
+              error={errors.branchId?.message}
+              {...register('branchId')}
+            >
+              <option value="">Seleccione una sucursal</option>
+              {activeBranches.map((branch) => (
+                <option key={branch.id} value={branch.id}>
+                  {branch.name}
+                </option>
+              ))}
+            </Select>
+          ) : null}
         </form>
       </div>
     </Modal>

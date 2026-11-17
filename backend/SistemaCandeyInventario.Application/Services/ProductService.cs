@@ -5,6 +5,7 @@ using SistemaCandeyInventario.Application.DTOs.Common;
 using SistemaCandeyInventario.Application.DTOs.Products;
 using SistemaCandeyInventario.Application.Interfaces;
 using SistemaCandeyInventario.Domain.Entities;
+using SistemaCandeyInventario.Domain.Enums;
 
 namespace SistemaCandeyInventario.Application.Services;
 
@@ -26,7 +27,9 @@ public class ProductService : IProductService
             query = query.Where(product => product.IsActive == active.Value);
         }
 
-        return await query
+        var committedByProduct = await GetCommittedStockMapAsync(ct);
+
+        var items = await query
             .OrderBy(product => product.Name)
             .Select(product => new ProductResponse
             {
@@ -43,6 +46,9 @@ public class ProductService : IProductService
                 IsActive = product.IsActive
             })
             .ToListAsync(ct);
+
+        ApplyAvailability(items, committedByProduct);
+        return items;
     }
 
     public async Task<PagedResponse<ProductResponse>> GetPagedAsync(PageQuery query, bool? active = null, CancellationToken ct = default)
@@ -65,6 +71,7 @@ public class ProductService : IProductService
         }
 
         var total = await source.CountAsync(ct);
+        var committedByProduct = await GetCommittedStockMapAsync(ct);
 
         var items = await source
             .OrderBy(product => product.Name)
@@ -85,6 +92,8 @@ public class ProductService : IProductService
                 IsActive = product.IsActive
             })
             .ToListAsync(ct);
+
+        ApplyAvailability(items, committedByProduct);
 
         return new PagedResponse<ProductResponse>
         {
@@ -113,9 +122,20 @@ public class ProductService : IProductService
                 Price = item.Price,
                 IsActive = item.IsActive
             })
-            .FirstOrDefaultAsync(ct);
+            .FirstOrDefaultAsync(ct)
+            ?? throw new NotFoundException("El producto no existe.");
 
-        return product ?? throw new NotFoundException("El producto no existe.");
+        var committed = await _context.BranchRequestDetails
+            .Where(detail =>
+                detail.ProductId == id &&
+                detail.BranchRequest != null &&
+                detail.BranchRequest.IsRegistered &&
+                detail.BranchRequest.Status == BranchRequestStatus.Pending)
+            .SumAsync(detail => (int?)detail.RequestedQuantity, ct) ?? 0;
+
+        product.CommittedStock = committed;
+        product.AvailableStock = Math.Max(product.Stock - committed, 0);
+        return product;
     }
 
     public async Task<ProductResponse> CreateAsync(CreateProductRequest request, CancellationToken ct = default)
@@ -214,5 +234,27 @@ public class ProductService : IProductService
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync(ct);
+    }
+
+    private async Task<Dictionary<int, int>> GetCommittedStockMapAsync(CancellationToken ct)
+    {
+        return await _context.BranchRequestDetails
+            .Where(detail =>
+                detail.BranchRequest != null &&
+                detail.BranchRequest.IsRegistered &&
+                detail.BranchRequest.Status == BranchRequestStatus.Pending)
+            .GroupBy(detail => detail.ProductId)
+            .Select(group => new { ProductId = group.Key, Quantity = group.Sum(item => item.RequestedQuantity) })
+            .ToDictionaryAsync(item => item.ProductId, item => item.Quantity, ct);
+    }
+
+    private static void ApplyAvailability(List<ProductResponse> items, Dictionary<int, int> committedByProduct)
+    {
+        foreach (var item in items)
+        {
+            var committed = committedByProduct.GetValueOrDefault(item.Id);
+            item.CommittedStock = committed;
+            item.AvailableStock = Math.Max(item.Stock - committed, 0);
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace SistemaCandeyInventario.Application.Common.Interfaces;
 /// </summary>
 public interface IAppDbContext
 {
+    DbSet<User> Users { get; }
     DbSet<Category> Categories { get; }
     DbSet<Unit> Units { get; }
     DbSet<Supplier> Suppliers { get; }
@@ -19,7 +20,11 @@ public interface IAppDbContext
     DbSet<Exit> Exits { get; }
     DbSet<ExitDetail> ExitDetails { get; }
     DbSet<KardexMovement> KardexMovements { get; }
+    DbSet<BranchRequest> BranchRequests { get; }
+    DbSet<BranchRequestDetail> BranchRequestDetails { get; }
+    DbSet<EntryOrder> EntryOrders { get; }
+    DbSet<EntryOrderDetail> EntryOrderDetails { get; }
 
     Task<int> SaveChangesAsync(CancellationToken ct = default);
+    Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken ct = default);
 }
-

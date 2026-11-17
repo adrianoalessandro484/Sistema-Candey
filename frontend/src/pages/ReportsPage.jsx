@@ -1,17 +1,21 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeftRight,
+  BarChart3,
   CircleAlert,
   CircleCheck,
   Coins,
   MessageCircle,
   Package,
+  PackagePlus,
   Printer,
   RotateCw,
   TriangleAlert,
 } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import EmptyState from '../components/EmptyState.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import Spinner from '../components/Spinner.jsx'
@@ -37,14 +41,32 @@ function shareByWhatsApp(items) {
 }
 
 export default function ReportsPage() {
+  const navigate = useNavigate()
   const { report, loading, error, reload } = useReports()
   const [tab, setTab] = useState('stock')
+
+  function createOrderFromAlerts() {
+    const lines = report.alerts.map((item) => ({
+      productId: String(item.productId),
+      quantity: Math.max(item.missing || item.minStock - item.stock, 1),
+    }))
+
+    navigate('/ordenes-ingreso', {
+      state: {
+        prefillOrder: {
+          note: 'Reposición generada desde alertas preventivas',
+          lines,
+        },
+      },
+    })
+  }
 
   if (loading) {
     return (
       <div className="flex flex-col gap-6">
         <PageHeader
           eyebrow="Análisis"
+          icon={BarChart3}
           title="Reportes"
           description="Existencias, rotación y alertas del inventario."
         />
@@ -60,24 +82,17 @@ export default function ReportsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Análisis"
+        icon={BarChart3}
         title="Reportes"
         description="Existencias, rotación y alertas del inventario."
       >
-        <Button variant="secondary" onClick={reload}>
-          <RotateCw size={16} />
+        <Button variant="secondary" size="lg" onClick={reload}>
+          <RotateCw size={19} />
           Actualizar
         </Button>
       </PageHeader>
 
-      {error ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn sm:flex-row sm:items-center sm:justify-between">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload} className="w-full sm:w-auto">
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <StatCard
@@ -111,7 +126,7 @@ export default function ReportsPage() {
           <div
             role="tablist"
             aria-label="Secciones del reporte"
-            className="inline-flex h-auto min-w-max items-center gap-1 rounded-2xl border border-line-strong bg-surface p-1.5 shadow-sm"
+            className="inline-flex h-auto min-w-max items-center gap-1.5 rounded-2xl border border-line-strong bg-surface p-1.5 shadow-[var(--shadow-card)]"
           >
             {TABS.map((item) => {
               const Icon = item.icon
@@ -125,17 +140,17 @@ export default function ReportsPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setTab(item.id)}
-                  className={`inline-flex h-11 items-center gap-2 rounded-xl px-4 text-[14px] font-semibold transition-colors ${
+                  className={`inline-flex h-12 items-center gap-2.5 rounded-xl px-5 text-[14.5px] font-semibold transition-all active:scale-[0.98] ${
                     isActive
                       ? 'bg-wine text-white shadow-sm hover:bg-wine'
                       : 'text-body hover:bg-candey-50 hover:text-candey-dark'
                   }`}
                 >
-                  <Icon size={16} aria-hidden="true" />
+                  <Icon size={18} aria-hidden="true" />
                   <span className="whitespace-nowrap">{item.label}</span>
                   {showCount ? (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                      className={`rounded-full px-2.5 py-0.5 text-[11.5px] font-bold tabular-nums ${
                         isActive ? 'bg-white text-wine' : 'bg-danger text-white'
                       }`}
                     >
@@ -159,19 +174,39 @@ export default function ReportsPage() {
             />
           ) : (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-3 shadow-sm sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:p-4">
-                <Button
-                  variant="secondary"
-                  onClick={() => shareByWhatsApp(report.alerts)}
-                  className="w-full sm:w-auto"
-                >
-                  <MessageCircle size={16} />
-                  Enviar por WhatsApp
-                </Button>
-                <Button onClick={() => generateRequestPdf(report.alerts)} className="w-full sm:w-auto">
-                  <Printer size={16} />
-                  Solicitud (PDF)
-                </Button>
+              <div className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4 shadow-[var(--shadow-card)] lg:flex-row lg:items-center lg:justify-between">
+                <p className="text-[14px] text-muted">
+                  Comparte o programa la reposición para{' '}
+                  <strong className="text-ink">{report.alerts.length}</strong> producto(s).
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                  <Button
+                    variant="soft"
+                    size="md"
+                    onClick={createOrderFromAlerts}
+                    className="w-full sm:w-auto"
+                  >
+                    <PackagePlus size={18} />
+                    Generar orden de ingreso
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => shareByWhatsApp(report.alerts)}
+                    className="w-full sm:w-auto"
+                  >
+                    <MessageCircle size={18} />
+                    Enviar por WhatsApp
+                  </Button>
+                  <Button
+                    size="md"
+                    onClick={() => generateRequestPdf(report.alerts)}
+                    className="w-full sm:w-auto"
+                  >
+                    <Printer size={18} />
+                    Solicitud (PDF)
+                  </Button>
+                </div>
               </div>
               <AlertsTable items={report.alerts} />
             </div>
@@ -179,7 +214,7 @@ export default function ReportsPage() {
         ) : null}
       </div>
 
-      <p className="text-xs leading-relaxed text-muted">
+      <p className="text-[13px] leading-relaxed text-muted tabular-nums">
         Reporte generado con {report.summary.totalProducts} productos y {report.summary.units} unidades
         en inventario.
       </p>

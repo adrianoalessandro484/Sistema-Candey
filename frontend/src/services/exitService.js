@@ -38,6 +38,11 @@ export async function getExitsPage(params) {
   return mapPagedResponse(response.data, mapExit)
 }
 
+export async function getExitById(id) {
+  const response = await axios.get(`${API_URL}/salidas/${id}`)
+  return mapExit(response.data)
+}
+
 export async function createExit(exit) {
   const response = await axios.post(`${API_URL}/salidas`, {
     Date: exit.date,
@@ -56,4 +61,3 @@ export async function createExit(exit) {
 export function cancelExit(id) {
   return axios.patch(`${API_URL}/salidas/${id}/anular`)
 }
-

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import { CircleCheck, Plus, RotateCw, Store } from 'lucide-react'
+import { useState } from 'react'
+import { CircleCheck, Plus, Store } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import SearchInput from '../components/SearchInput.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
+import TableToolbar from '../components/TableToolbar.jsx'
 import Pagination from '../components/Pagination.jsx'
-import Spinner from '../components/Spinner.jsx'
 import { useToast } from '../components/toast/toastContext.js'
 import BranchesTable from '../components/branches/BranchesTable.jsx'
 import BranchFormModal from '../components/branches/BranchFormModal.jsx'
@@ -41,9 +41,15 @@ export default function BranchesPage() {
   const [confirmation, setConfirmation] = useState(CLOSED_CONFIRM)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
+  function handleSearchChange(value) {
+    setSearch(value)
     setPage(1)
-  }, [debouncedSearch, pageSize])
+  }
+
+  function handlePageSizeChange(value) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   function reload() {
     reloadAll()
@@ -107,11 +113,12 @@ export default function BranchesPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Administración"
+        icon={Store}
         title="Sucursales"
         description="Destinos de despacho de los productos."
       >
-        <Button onClick={openCreate}>
-          <Plus size={18} />
+        <Button size="lg" onClick={openCreate}>
+          <Plus size={20} />
           Nueva sucursal
         </Button>
       </PageHeader>
@@ -126,37 +133,25 @@ export default function BranchesPage() {
         <StatCard icon={CircleCheck} label="Sucursales activas" value={String(activeCount)} tone="ok" />
       </div>
 
-      {error ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload}>
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput value={search} onChange={setSearch} placeholder="Buscar sucursal..." />
-        <span className="text-[12.5px] text-muted">
-          {meta?.totalItems ?? 0} sucursal(es) en total
-        </span>
-      </div>
+      <TableToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Buscar sucursal..."
+        totalCount={meta?.totalItems ?? 0}
+        totalLabel="sucursal(es)"
+        onRefresh={reload}
+        refreshing={fetching}
+      />
 
-      {loading && !tableLoading ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-16 text-sm text-muted">
-          <Spinner className="size-5 text-candey" />
-          Cargando sucursales...
-        </div>
-      ) : (
-        <BranchesTable
-          branches={pagedBranches}
-          loading={tableLoading}
-          onEdit={openEdit}
-          onChangeStatus={toggleStatus}
-          onDelete={(branch) => setConfirmation({ open: true, branch })}
-        />
-      )}
+      <BranchesTable
+        branches={pagedBranches}
+        loading={tableLoading || (loading && pagedBranches.length === 0)}
+        onEdit={openEdit}
+        onChangeStatus={toggleStatus}
+        onDelete={(branch) => setConfirmation({ open: true, branch })}
+      />
 
       <Pagination
         page={page}
@@ -164,7 +159,7 @@ export default function BranchesPage() {
         totalItems={meta?.totalItems ?? 0}
         totalPages={meta?.totalPages ?? 0}
         onPageChange={setPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         itemLabel="sucursales"
         disabled={fetching}
       />

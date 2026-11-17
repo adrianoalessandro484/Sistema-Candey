@@ -1,15 +1,17 @@
 ﻿import { useState } from 'react'
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
   BarChart3,
   Boxes,
   ChevronRight,
+  ClipboardCheck,
   LayoutDashboard,
   LogOut,
   Menu,
   Package,
+  PackagePlus,
   Store,
   Tag,
   Truck,
@@ -34,6 +36,8 @@ const MENU = [
   {
     group: 'Operación',
     items: [
+      { to: '/requerimientos', label: 'Requerimientos', icon: ClipboardCheck, module: 'branchRequests' },
+      { to: '/ordenes-ingreso', label: 'Órdenes de ingreso', icon: PackagePlus, module: 'entryOrders' },
       { to: '/entradas', label: 'Entradas', icon: ArrowDownToLine, module: 'entries' },
       { to: '/salidas', label: 'Salidas', icon: ArrowUpFromLine, module: 'exits' },
     ],
@@ -58,6 +62,8 @@ const MENU = [
 
 const PAGE_TITLES = {
   '/': 'Inicio',
+  '/requerimientos': 'Requerimientos',
+  '/ordenes-ingreso': 'Órdenes de ingreso',
   '/usuarios': 'Usuarios',
   '/productos': 'Productos',
   '/categorias': 'Categorías',
@@ -94,17 +100,35 @@ export default function DashboardLayout() {
           isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="px-2.5 pt-1.5 pb-5">
-          <Logo tone="light" />
-          <p className="mt-3 pl-[42px] text-[11px] font-semibold tracking-[0.18em] text-white/45 uppercase">
-            Inventario
-          </p>
+        <div className="flex items-center justify-between gap-2 px-2 pt-1 pb-5">
+          <Link
+            to="/"
+            onClick={() => setIsMenuOpen(false)}
+            className="flex items-center gap-3 rounded-2xl p-1 transition-opacity hover:opacity-90"
+          >
+            <Logo compact />
+            <div className="flex flex-col leading-tight">
+              <span className="text-[18px] font-bold tracking-tight text-white">Candey</span>
+              <span className="text-[11px] font-semibold tracking-[0.18em] text-gold-light/80 uppercase">
+                Inventario
+              </span>
+            </div>
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="Cerrar menú lateral"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white lg:hidden"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="flex flex-1 flex-col gap-5 overflow-y-auto pb-4" aria-label="Menú principal">
           {menu.map((section) => (
-            <div key={section.group} className="flex flex-col gap-1">
-              <p className="px-3 pb-1 text-[10px] font-bold tracking-[0.18em] text-white/35 uppercase">
+            <div key={section.group} className="flex flex-col gap-1.5">
+              <p className="px-3.5 pb-0.5 text-[10.5px] font-bold tracking-[0.18em] text-white/40 uppercase">
                 {section.group}
               </p>
               {section.items.map((item) => (
@@ -113,19 +137,19 @@ export default function DashboardLayout() {
                   to={item.to}
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-all ${
+                    `relative flex min-h-[46px] items-center gap-3.5 rounded-2xl px-3.5 py-2.5 text-[14.5px] font-medium transition-all duration-150 ${
                       isActive
-                        ? 'brand-gradient text-white shadow-[0_10px_22px_rgba(214,54,98,0.32)]'
-                        : 'text-white/65 hover:bg-white/10 hover:text-white'
+                        ? 'brand-gradient font-semibold text-white shadow-[0_10px_24px_rgba(214,54,98,0.36)]'
+                        : 'text-white/72 hover:bg-white/10 hover:text-white'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive ? (
-                        <span className="absolute top-1/2 left-1.5 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gold-light" />
+                        <span className="absolute top-1/2 left-1.5 h-5 w-1 -translate-y-1/2 rounded-full bg-gold-light" />
                       ) : null}
-                      <item.icon size={18} />
+                      <item.icon size={20} className="shrink-0" />
                       <span>{item.label}</span>
                     </>
                   )}
@@ -135,21 +159,29 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-3">
-          <p className="text-[12.5px] font-semibold text-white/85">Candey Cosméticos</p>
-          <p className="text-[11px] text-white/45">Candey App v1.0</p>
+        <div className="rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-3.5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[13px] font-semibold text-white/90">Candey Cosméticos</p>
+            <span className="h-2 w-2 rounded-full bg-gold-light" aria-hidden="true" />
+          </div>
+          <p className="mt-0.5 text-[11.5px] text-white/50">
+            {profile.branchName ? profile.branchName : 'Control de almacén · v1.0'}
+          </p>
         </div>
       </aside>
 
       {isMenuOpen ? (
-        <div className="fixed inset-0 z-30 bg-black/45 lg:hidden" onClick={() => setIsMenuOpen(false)} />
+        <div
+          className="fixed inset-0 z-30 bg-black/45 backdrop-blur-[2px] lg:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col lg:ml-[var(--sidebar-w)]">
-        <header className="sticky top-0 z-20 flex h-[72px] items-center gap-3 border-b border-line bg-white/85 px-5 backdrop-blur-md lg:px-7">
+        <header className="sticky top-0 z-20 flex h-[76px] items-center gap-3 border-b border-line bg-white/88 px-5 backdrop-blur-md lg:px-8">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-white text-body hover:border-candey/40 hover:text-candey lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line-strong bg-white text-body shadow-xs transition-colors hover:border-candey/45 hover:bg-candey-50 hover:text-candey lg:hidden"
             onClick={() => setIsMenuOpen((value) => !value)}
             aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
@@ -157,48 +189,49 @@ export default function DashboardLayout() {
           </button>
 
           <nav aria-label="Ubicación" className="min-w-0">
-            <ol className="flex items-center gap-2 text-[13.5px] text-muted">
+            <ol className="flex items-center gap-2 text-[14px] text-muted">
               <li>
-                <a href="/" className="transition-colors hover:text-candey">
+                <Link to="/" className="font-medium transition-colors hover:text-candey">
                   Candey
-                </a>
+                </Link>
               </li>
               <li aria-hidden="true">
-                <ChevronRight size={14} />
+                <ChevronRight size={15} />
               </li>
-              <li className="truncate text-[15px] font-semibold text-ink">{title}</li>
+              <li className="truncate text-[16px] font-bold text-ink">{title}</li>
             </ol>
           </nav>
 
           <div className="flex-1" />
 
-          <div className="hidden items-center gap-2 rounded-full border border-gold/35 bg-gold-50 px-3.5 py-1.5 md:inline-flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold-dark" />
-            <span className="text-[11.5px] font-semibold text-gold-dark">Modo visual · datos demo</span>
-          </div>
-
           <div className="flex items-center gap-3">
             <div className="hidden flex-col items-end leading-tight sm:flex">
-              <span className="text-[14px] font-semibold text-ink">{profile.userName}</span>
-              <span className="text-[12px] text-muted">{roleLabel(profile.role)}</span>
+              <span className="text-[14.5px] font-semibold text-ink">{profile.userName}</span>
+              <span className="text-[12px] font-medium text-muted">
+                {roleLabel(profile.role)}
+                {profile.branchName ? ` · ${profile.branchName}` : ''}
+              </span>
             </div>
-            <Avatar className="h-10 w-10 ring-2 ring-gold/40 ring-offset-2 ring-offset-white">
-              <AvatarFallback className="text-[12px]">{initials(profile.userName)}</AvatarFallback>
+            <Avatar className="h-11 w-11 ring-2 ring-gold/45 ring-offset-2 ring-offset-white">
+              <AvatarFallback className="text-[13px] font-bold">{initials(profile.userName)}</AvatarFallback>
             </Avatar>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-muted transition-colors hover:border-danger/40 hover:bg-danger-bg hover:text-danger"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface px-3.5 text-[14px] font-semibold text-body shadow-xs transition-all hover:border-danger/45 hover:bg-danger-bg hover:text-danger active:scale-95"
               onClick={logout}
               title="Cerrar sesión"
               aria-label="Cerrar sesión"
             >
               <LogOut size={18} />
+              <span className="hidden sm:inline">Salir</span>
             </button>
           </div>
         </header>
 
-        <main className="flex-1 px-5 py-7 pb-12 lg:px-7">
-          <Outlet />
+        <main className="flex-1 px-5 py-7 pb-14 lg:px-8">
+          <div key={location.pathname} className="page-enter">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

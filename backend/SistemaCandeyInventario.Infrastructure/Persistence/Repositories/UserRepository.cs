@@ -17,6 +17,7 @@ public class UserRepository : IUserRepository
     public async Task<List<User>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Users
+            .Include(user => user.Branch)
             .Where(user => user.IsRegistered)
             .OrderBy(user => user.Name)
             .ToListAsync(ct);
@@ -25,12 +26,14 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByIdAsync(int id, CancellationToken ct = default)
     {
         return await _context.Users
+            .Include(user => user.Branch)
             .FirstOrDefaultAsync(user => user.UserId == id && user.IsRegistered, ct);
     }
 
     public async Task<User?> GetByUserNameAsync(string userName, CancellationToken ct = default)
     {
         return await _context.Users
+            .Include(user => user.Branch)
             .FirstOrDefaultAsync(user => user.Name == userName && user.IsRegistered, ct);
     }
 

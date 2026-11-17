@@ -42,7 +42,7 @@ export default function ExitsTable({ exits, onView, onCancel, loading }) {
         id: 'units',
         header: 'Unidades',
         accessorFn: (row) => row.totalUnits,
-        cell: ({ getValue }) => <span className="font-medium text-ink">{getValue()}</span>,
+        cell: ({ getValue }) => <span className="font-semibold text-ink tabular-nums">{getValue()}</span>,
       },
       {
         id: 'status',
@@ -68,7 +68,7 @@ export default function ExitsTable({ exits, onView, onCancel, loading }) {
           const isCancelled = exit.status === 'Anulada'
 
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Ver detalle" onClick={() => onView(exit)}>
                 <Eye size={16} />
               </IconButton>

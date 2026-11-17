@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SistemaCandeyInventario.Application.DTOs.Products;
 
 public class ProductResponse
@@ -13,6 +11,8 @@ public class ProductResponse
     public string UnitName { get; set; } = string.Empty;
     public int MinStock { get; set; }
     public int Stock { get; set; }
+    public int CommittedStock { get; set; }
+    public int AvailableStock { get; set; }
     public decimal Price { get; set; }
     public bool IsActive { get; set; }
 }

@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react'
-import { Package, PackagePlus, Plus, RotateCw, TriangleAlert } from 'lucide-react'
+import { useState } from 'react'
+import { Package, PackagePlus, Plus, TriangleAlert } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import SearchInput from '../components/SearchInput.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
+import TableToolbar from '../components/TableToolbar.jsx'
 import Pagination from '../components/Pagination.jsx'
-import Spinner from '../components/Spinner.jsx'
 import { useToast } from '../components/toast/toastContext.js'
+import { useSession } from '../context/sessionContext.js'
 import ProductsTable from '../components/products/ProductsTable.jsx'
 import ProductFormModal from '../components/products/ProductFormModal.jsx'
 import { useProducts, useProductsPage } from '../hooks/useProducts.js'
 import { useCategories } from '../hooks/useCategories.js'
 import { useUnits } from '../hooks/useUnits.js'
 import { useDebouncedValue } from '../hooks/useDebouncedValue.js'
+import { can } from '../utils/permissions.js'
 import {
   createProduct,
   updateProduct,
@@ -26,6 +28,8 @@ const CLOSED_CONFIRM = { open: false, product: null }
 
 export default function ProductsPage() {
   const { notify } = useToast()
+  const { user } = useSession()
+  const canManage = can(user?.role, 'products.manage')
   const { products, loading, error: allError, reload: reloadAll } = useProducts()
   const { categories } = useCategories()
   const { units } = useUnits()
@@ -45,9 +49,15 @@ export default function ProductsPage() {
   const [confirmation, setConfirmation] = useState(CLOSED_CONFIRM)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
+  function handleSearchChange(value) {
+    setSearch(value)
     setPage(1)
-  }, [debouncedSearch, pageSize])
+  }
+
+  function handlePageSizeChange(value) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   function reload() {
     reloadAll()
@@ -114,13 +124,20 @@ export default function ProductsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Catálogo"
+        icon={Package}
         title="Productos"
-        description="Catálogo de productos, stock mínimo y control de existencias."
+        description={
+          canManage
+            ? 'Catálogo de productos, stock mínimo y control de existencias.'
+            : 'Consulta el catálogo del almacén central y la disponibilidad real para pedidos.'
+        }
       >
-        <Button onClick={openCreate}>
-          <Plus size={18} />
-          Nuevo producto
-        </Button>
+        {canManage ? (
+          <Button size="lg" onClick={openCreate}>
+            <Plus size={20} />
+            Nuevo producto
+          </Button>
+        ) : null}
       </PageHeader>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -134,41 +151,26 @@ export default function ProductsPage() {
         <StatCard icon={PackagePlus} label="Sin stock" value={String(outOfStock)} tone="danger" />
       </div>
 
-      {error ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload}>
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Buscar por nombre, categoría o unidad..."
-        />
-        <span className="text-[12.5px] text-muted">
-          {meta?.totalItems ?? 0} producto(s) en total
-        </span>
-      </div>
+      <TableToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Buscar por nombre, categoría o unidad..."
+        totalCount={meta?.totalItems ?? 0}
+        totalLabel="producto(s)"
+        onRefresh={reload}
+        refreshing={fetching}
+      />
 
-      {loading && !tableLoading ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-16 text-sm text-muted">
-          <Spinner className="size-5 text-candey" />
-          Cargando productos...
-        </div>
-      ) : (
-        <ProductsTable
-          products={pagedProducts}
-          loading={tableLoading}
-          onEdit={openEdit}
-          onChangeStatus={toggleStatus}
-          onDelete={(product) => setConfirmation({ open: true, product })}
-        />
-      )}
+      <ProductsTable
+        products={pagedProducts}
+        canManage={canManage}
+        loading={tableLoading || (loading && pagedProducts.length === 0)}
+        onEdit={openEdit}
+        onChangeStatus={toggleStatus}
+        onDelete={(product) => setConfirmation({ open: true, product })}
+      />
 
       <Pagination
         page={page}
@@ -176,30 +178,34 @@ export default function ProductsPage() {
         totalItems={meta?.totalItems ?? 0}
         totalPages={meta?.totalPages ?? 0}
         onPageChange={setPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         itemLabel="productos"
         disabled={fetching}
       />
 
-      <ProductFormModal
-        open={modal.open}
-        mode={modal.mode}
-        product={modal.product}
-        categories={categories}
-        units={units}
-        onClose={closeModal}
-        onSave={saveProduct}
-      />
+      {canManage ? (
+        <>
+          <ProductFormModal
+            open={modal.open}
+            mode={modal.mode}
+            product={modal.product}
+            categories={categories}
+            units={units}
+            onClose={closeModal}
+            onSave={saveProduct}
+          />
 
-      <ConfirmDialog
-        open={confirmation.open}
-        title="Eliminar producto"
-        message={`¿Deseas eliminar "${confirmation.product?.name}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        loading={processing}
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmation(CLOSED_CONFIRM)}
-      />
+          <ConfirmDialog
+            open={confirmation.open}
+            title="Eliminar producto"
+            message={`¿Deseas eliminar "${confirmation.product?.name}"? Esta acción no se puede deshacer.`}
+            confirmText="Eliminar"
+            loading={processing}
+            onConfirm={confirmDelete}
+            onCancel={() => setConfirmation(CLOSED_CONFIRM)}
+          />
+        </>
+      ) : null}
     </div>
   )
 }

@@ -62,7 +62,7 @@ export default function UnitsTable({ units, onEdit, onChangeStatus, onDelete, lo
         cell: ({ row }) => {
           const unit = row.original
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(unit)}>
                 <Pencil size={16} />
               </IconButton>

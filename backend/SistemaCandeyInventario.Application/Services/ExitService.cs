@@ -178,6 +178,23 @@ public class ExitService : IExitService
             throw new ValidationException("La salida ya está anulada.");
         }
 
+        var linkedRequest = await _context.BranchRequests
+            .FirstOrDefaultAsync(req => req.ExitId == exit.ExitId && req.IsRegistered, ct);
+
+        if (linkedRequest is not null)
+        {
+            if (linkedRequest.Status == BranchRequestStatus.Received)
+            {
+                throw new ValidationException("No se puede anular una salida que ya fue confirmada como recibida por la sucursal.");
+            }
+
+            if (linkedRequest.Status == BranchRequestStatus.InTransit || linkedRequest.Status == BranchRequestStatus.Observed)
+            {
+                linkedRequest.Status = BranchRequestStatus.Cancelled;
+                linkedRequest.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
         foreach (var detail in exit.Details)
         {
             var lot = detail.Lot!;

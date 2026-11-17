@@ -7,5 +7,6 @@ public enum UserRole
 {
     Administrator = 1,
     EntryClerk = 2,
-    ExitClerk = 3
+    ExitClerk = 3,
+    BranchClerk = 4
 }

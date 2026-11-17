@@ -12,8 +12,18 @@ public static class DbSeeder
 {
     public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher, CancellationToken ct = default)
     {
+        if (!await context.Branches.AnyAsync(ct))
+        {
+            context.Branches.AddRange(
+                new Branch { Name = "Sede Central", Address = "Av. Principal 100, Lima", Phone = "014567890", CreatedAt = DateTime.UtcNow },
+                new Branch { Name = "Sucursal Norte", Address = "Av. Los Jazmines 250, Lima", Phone = "014567891", CreatedAt = DateTime.UtcNow });
+            await context.SaveChangesAsync(ct);
+        }
+
         if (!await context.Users.AnyAsync(ct))
         {
+            var firstBranch = await context.Branches.OrderBy(b => b.BranchId).FirstOrDefaultAsync(ct);
+
             context.Users.AddRange(
                 new User
                 {
@@ -42,6 +52,20 @@ public static class DbSeeder
                     CreatedAt = DateTime.UtcNow,
                     IsRegistered = true
                 });
+
+            if (firstBranch is not null)
+            {
+                context.Users.Add(new User
+                {
+                    Name = "sucursal",
+                    PasswordHash = passwordHasher.Hash("Candey123"),
+                    Role = UserRole.BranchClerk,
+                    BranchId = firstBranch.BranchId,
+                    HasAccess = true,
+                    CreatedAt = DateTime.UtcNow,
+                    IsRegistered = true
+                });
+            }
         }
 
         if (!await context.Categories.AnyAsync(ct))
@@ -71,15 +95,6 @@ public static class DbSeeder
                 new Supplier { Name = "Import Cosmetic EIRL", TaxId = "20487654321", Phone = "912345678", Email = "contacto@importcosmetic.pe", Address = "Jr. Comercio 456, Arequipa", CreatedAt = DateTime.UtcNow });
         }
 
-        if (!await context.Branches.AnyAsync(ct))
-        {
-            context.Branches.AddRange(
-                new Branch { Name = "Sede Central", Address = "Av. Principal 100, Lima", Phone = "014567890", CreatedAt = DateTime.UtcNow },
-                new Branch { Name = "Sucursal Norte", Address = "Av. Los Jazmines 250, Lima", Phone = "014567891", CreatedAt = DateTime.UtcNow });
-        }
-
         await context.SaveChangesAsync(ct);
     }
 }
-
-

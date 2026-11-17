@@ -87,100 +87,116 @@ export default function EntryFormModal({ open, onClose, onSave, products, suppli
           />
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-ink">Productos y lotes</h3>
-              <Button variant="secondary" type="button" onClick={() => append({ ...emptyEntryLine })}>
-                <Plus size={16} />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col">
+                <h3 className="text-[15px] font-bold text-ink">Productos y lotes</h3>
+                <p className="text-[12.5px] text-muted">Agrega las líneas del documento de ingreso</p>
+              </div>
+              <Button variant="soft" size="sm" type="button" onClick={() => append({ ...emptyEntryLine })}>
+                <Plus size={18} />
                 Agregar producto
               </Button>
             </div>
 
             {typeof errors.lines?.message === 'string' ? (
-              <span className="text-xs text-danger" role="alert">
+              <span className="text-xs font-medium text-danger" role="alert">
                 {errors.lines.message}
               </span>
             ) : null}
 
-            {fields.map((field, index) => (
-              <div key={field.id} className="rounded-xl border border-line bg-surface-2 p-3">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold tracking-wide text-muted uppercase">
-                    Producto {index + 1}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => remove(index)}
-                    disabled={fields.length === 1}
-                    className="inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs text-muted transition-colors hover:border-danger hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Trash2 size={14} />
-                    Quitar
-                  </button>
-                </div>
+            {fields.map((field, index) => {
+              const currentLine = lines[index] ?? {}
+              const lineSubtotal = Number(currentLine.quantity || 0) * Number(currentLine.unitCost || 0)
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              return (
+                <div key={field.id} className="rounded-2xl border border-line bg-surface-2 p-4">
+                  <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <span className="inline-flex items-center rounded-full bg-candey-50 px-3 py-1 text-[11.5px] font-bold tracking-wide text-candey uppercase">
+                        Línea {index + 1}
+                      </span>
+                      <span className="text-[13px] font-semibold text-muted tabular-nums">
+                        Subtotal: <strong className="text-ink">{formatCurrency(lineSubtotal)}</strong>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      disabled={fields.length === 1}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-line-strong bg-white px-3.5 text-[13px] font-semibold text-muted transition-all hover:border-danger/50 hover:bg-danger-bg hover:text-danger active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Trash2 size={15} />
+                      Quitar
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
                     <Select
                       id={`product-${index}`}
                       label="Producto"
                       required
                       className="sm:col-span-2 lg:col-span-4"
-                    error={errors.lines?.[index]?.productId?.message}
-                    {...register(`lines.${index}.productId`)}
-                  >
-                    <option value="">Seleccione un producto</option>
-                    {products.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </Select>
+                      error={errors.lines?.[index]?.productId?.message}
+                      {...register(`lines.${index}.productId`)}
+                    >
+                      <option value="">Seleccione un producto</option>
+                      {products.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name}
+                        </option>
+                      ))}
+                    </Select>
 
-                  <Input
-                    id={`lot-${index}`}
-                    label="Lote"
-                    placeholder="Ej. L-2026-01"
-                    error={errors.lines?.[index]?.lotCode?.message}
-                    {...register(`lines.${index}.lotCode`)}
-                  />
+                    <Input
+                      id={`lot-${index}`}
+                      label="Lote"
+                      placeholder="Ej. L-2026-01"
+                      error={errors.lines?.[index]?.lotCode?.message}
+                      {...register(`lines.${index}.lotCode`)}
+                    />
 
-                  <Input
-                    id={`quantity-${index}`}
-                    label="Cantidad"
-                    type="number"
-                    min="1"
-                    error={errors.lines?.[index]?.quantity?.message}
-                    {...register(`lines.${index}.quantity`)}
-                  />
+                    <Input
+                      id={`quantity-${index}`}
+                      label="Cantidad"
+                      type="number"
+                      min="1"
+                      error={errors.lines?.[index]?.quantity?.message}
+                      {...register(`lines.${index}.quantity`)}
+                    />
 
-                  <Input
-                    id={`cost-${index}`}
-                    label="Costo unitario"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    error={errors.lines?.[index]?.unitCost?.message}
-                    {...register(`lines.${index}.unitCost`)}
-                  />
+                    <Input
+                      id={`cost-${index}`}
+                      label="Costo unitario"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      error={errors.lines?.[index]?.unitCost?.message}
+                      {...register(`lines.${index}.unitCost`)}
+                    />
 
-                  <Input
-                    id={`expiration-${index}`}
-                    label="Vencimiento"
-                    type="date"
-                    error={errors.lines?.[index]?.expirationDate?.message}
-                    {...register(`lines.${index}.expirationDate`)}
-                  />
+                    <Input
+                      id={`expiration-${index}`}
+                      label="Vencimiento"
+                      type="date"
+                      error={errors.lines?.[index]?.expirationDate?.message}
+                      {...register(`lines.${index}.expirationDate`)}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-6 rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm">
-            <span className="text-muted">
-              Unidades: <strong className="text-ink">{totalUnits}</strong>
-            </span>
-            <span className="text-muted">
-              Costo total: <strong className="text-ink">{formatCurrency(totalCost)}</strong>
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-candey/20 bg-candey-50/45 px-5 py-4 text-[14.5px]">
+            <span className="font-medium text-body">Resumen de entrada ({fields.length} línea(s))</span>
+            <div className="flex flex-wrap items-center gap-6 tabular-nums">
+              <span className="text-muted">
+                Unidades: <strong className="text-[16px] text-ink">{totalUnits}</strong>
+              </span>
+              <span className="text-muted">
+                Costo total: <strong className="text-[17px] text-candey-dark">{formatCurrency(totalCost)}</strong>
+              </span>
+            </div>
           </div>
         </form>
       </div>

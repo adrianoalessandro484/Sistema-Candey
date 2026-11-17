@@ -47,8 +47,9 @@ public class AuthService : IAuthService
             Token = token,
             UserId = user.UserId,
             UserName = user.Name,
-            Role = user.Role.ToString()
+            Role = user.Role.ToString(),
+            BranchId = user.BranchId,
+            BranchName = user.Branch?.Name
         };
     }
 }
-

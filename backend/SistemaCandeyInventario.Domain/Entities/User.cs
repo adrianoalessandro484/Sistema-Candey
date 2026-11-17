@@ -17,4 +17,8 @@ public class User : BaseEntity
     public UserRole Role { get; set; } = UserRole.ExitClerk;
 
     public bool HasAccess { get; set; } = true;
+
+    public int? BranchId { get; set; }
+
+    public Branch? Branch { get; set; }
 }

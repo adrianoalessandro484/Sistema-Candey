@@ -12,5 +12,7 @@ export async function login({ userName, password }) {
     userId: response.data.UserId,
     userName: response.data.UserName,
     role: response.data.Role,
+    branchId: response.data.BranchId ?? null,
+    branchName: response.data.BranchName ?? null,
   }
 }

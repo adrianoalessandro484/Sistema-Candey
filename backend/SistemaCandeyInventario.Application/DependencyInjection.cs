@@ -19,6 +19,8 @@ public static class DependencyInjection
         services.AddScoped<IEntryService, EntryService>();
         services.AddScoped<IExitService, ExitService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IBranchRequestService, BranchRequestService>();
+        services.AddScoped<IEntryOrderService, EntryOrderService>();
         return services;
     }
 }

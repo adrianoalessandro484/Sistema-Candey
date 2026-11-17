@@ -15,4 +15,6 @@ public class UpdateUserRequest
 
     [EnumDataType(typeof(UserRole), ErrorMessage = "Seleccione un rol válido.")]
     public UserRole Role { get; set; }
+
+    public int? BranchId { get; set; }
 }

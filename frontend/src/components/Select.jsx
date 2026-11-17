@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import { ChevronDown } from 'lucide-react'
-import Field, { controlClasses } from './Field.jsx'
+import Field from './Field.jsx'
+import { controlClasses } from './fieldStyles.js'
 
 const Select = forwardRef(function Select(
   {
@@ -26,14 +27,14 @@ const Select = forwardRef(function Select(
           aria-describedby={error ? `${id}-error` : undefined}
           className={controlClasses(
             Boolean(error),
-            `h-12 cursor-pointer appearance-none py-0 pr-11 pl-4 ${controlClassName}`,
+            `h-[52px] cursor-pointer appearance-none py-0 pr-12 pl-4 ${controlClassName}`,
           )}
           {...rest}
         >
           {children}
         </select>
         <ChevronDown
-          size={18}
+          size={19}
           className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted"
           aria-hidden="true"
         />

@@ -22,6 +22,23 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Exit> Exits => Set<Exit>();
     public DbSet<ExitDetail> ExitDetails => Set<ExitDetail>();
     public DbSet<KardexMovement> KardexMovements => Set<KardexMovement>();
+    public DbSet<BranchRequest> BranchRequests => Set<BranchRequest>();
+    public DbSet<BranchRequestDetail> BranchRequestDetails => Set<BranchRequestDetail>();
+    public DbSet<EntryOrder> EntryOrders => Set<EntryOrder>();
+    public DbSet<EntryOrderDetail> EntryOrderDetails => Set<EntryOrderDetail>();
+
+    public async Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken ct = default)
+    {
+        if (Database.CurrentTransaction is not null)
+        {
+            await action();
+            return;
+        }
+
+        await using var transaction = await Database.BeginTransactionAsync(ct);
+        await action();
+        await transaction.CommitAsync(ct);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

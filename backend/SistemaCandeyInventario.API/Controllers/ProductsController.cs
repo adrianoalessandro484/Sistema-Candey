@@ -19,14 +19,14 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrator,EntryClerk,ExitClerk")]
+    [Authorize(Roles = "Administrator,EntryClerk,ExitClerk,BranchClerk")]
     public async Task<IActionResult> GetAll([FromQuery] bool? active, [FromQuery] PageQuery pagination, CancellationToken ct)
         => pagination.IsPaged
             ? Ok(await _service.GetPagedAsync(pagination, active, ct))
             : Ok(await _service.GetAllAsync(active, ct));
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Administrator,EntryClerk,ExitClerk")]
+    [Authorize(Roles = "Administrator,EntryClerk,ExitClerk,BranchClerk")]
     public async Task<IActionResult> GetById(int id, CancellationToken ct)
         => Ok(await _service.GetByIdAsync(id, ct));
 

@@ -22,779 +22,1158 @@ namespace SistemaCandeyInventario.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Categoria", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Branch", b =>
                 {
-                    b.Property<int>("Cod_Categoria")
+                    b.Property<int>("BranchId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("cod_categoria");
+                        .HasColumnName("cod_sucursal");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Categoria"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BranchId"));
 
-                    b.Property<string>("Des_Categoria")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("des_categoria");
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("dir_sucursal");
 
-                    b.Property<bool>("Est_Activo")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_activo");
 
-                    b.Property<bool>("Est_Registro")
+                    b.Property<bool>("IsRegistered")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_registro");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nom_sucursal");
 
-                    b.Property<DateTime?>("Fec_Modificacion")
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tel_sucursal");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fec_modificacion");
 
-                    b.Property<string>("Nom_Categoria")
+                    b.HasKey("BranchId");
+
+                    b.ToTable("sucursales", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.BranchRequest", b =>
+                {
+                    b.Property<int>("BranchRequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_requerimiento");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BranchRequestId"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_sucursal");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<DateTime?>("DispatchedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_despacho");
+
+                    b.Property<int?>("ExitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_salida");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("obs_requerimiento");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_recepcion");
+
+                    b.Property<int?>("ReceivedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario_recibe");
+
+                    b.Property<string>("ReceptionNote")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("obs_recepcion");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("mot_rechazo");
+
+                    b.Property<string>("RequestCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("num_requerimiento");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_requerimiento");
+
+                    b.Property<int>("RequestedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario_solicita");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_revision");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario_revisa");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("est_estado");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
+
+                    b.HasKey("BranchRequestId");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("ExitId");
+
+                    b.HasIndex("ReceivedByUserId");
+
+                    b.HasIndex("RequestedByUserId");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.ToTable("requerimientos_sucursal", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.BranchRequestDetail", b =>
+                {
+                    b.Property<int>("BranchRequestDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_detrequerimiento");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BranchRequestDetailId"));
+
+                    b.Property<int>("BranchRequestId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_requerimiento");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    b.Property<int>("RequestedQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_solicitada");
+
+                    b.HasKey("BranchRequestDetailId");
+
+                    b.HasIndex("BranchRequestId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("detalles_requerimiento", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_categoria");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("des_categoria");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_activo");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)")
                         .HasColumnName("nom_categoria");
 
-                    b.HasKey("Cod_Categoria");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
+
+                    b.HasKey("CategoryId");
 
                     b.ToTable("categorias", (string)null);
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.DetalleEntrada", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entry", b =>
                 {
-                    b.Property<int>("Cod_DetEntrada")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_detentrada");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_DetEntrada"));
-
-                    b.Property<int>("Can_DetEntrada")
-                        .HasColumnType("integer")
-                        .HasColumnName("can_detentrada");
-
-                    b.Property<int>("Cod_Entrada")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_entrada");
-
-                    b.Property<int>("Cod_Lote")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_lote");
-
-                    b.Property<int>("Cod_Producto")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_producto");
-
-                    b.Property<decimal>("Cos_DetEntrada")
-                        .HasPrecision(12, 2)
-                        .HasColumnType("numeric(12,2)")
-                        .HasColumnName("cos_detentrada");
-
-                    b.Property<string>("Num_Lote")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("num_lote");
-
-                    b.HasKey("Cod_DetEntrada");
-
-                    b.HasIndex("Cod_Entrada");
-
-                    b.HasIndex("Cod_Lote");
-
-                    b.HasIndex("Cod_Producto");
-
-                    b.ToTable("detalles_entrada", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.DetalleSalida", b =>
-                {
-                    b.Property<int>("Cod_DetSalida")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_detsalida");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_DetSalida"));
-
-                    b.Property<int>("Can_DetSalida")
-                        .HasColumnType("integer")
-                        .HasColumnName("can_detsalida");
-
-                    b.Property<int>("Cod_Lote")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_lote");
-
-                    b.Property<int>("Cod_Producto")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_producto");
-
-                    b.Property<int>("Cod_Salida")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_salida");
-
-                    b.Property<string>("Num_Lote")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("num_lote");
-
-                    b.HasKey("Cod_DetSalida");
-
-                    b.HasIndex("Cod_Lote");
-
-                    b.HasIndex("Cod_Producto");
-
-                    b.HasIndex("Cod_Salida");
-
-                    b.ToTable("detalles_salida", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entrada", b =>
-                {
-                    b.Property<int>("Cod_Entrada")
+                    b.Property<int>("EntryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("cod_entrada");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Entrada"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EntryId"));
 
-                    b.Property<int>("Cod_Proveedor")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_proveedor");
-
-                    b.Property<int>("Cod_Usuario")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_usuario");
-
-                    b.Property<string>("Est_Estado")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("est_estado");
-
-                    b.Property<bool>("Est_Registro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_registro");
-
-                    b.Property<DateTime>("Fec_Creacion")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fec_creacion");
 
-                    b.Property<DateTime>("Fec_Entrada")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_entrada");
-
-                    b.Property<DateTime?>("Fec_Modificacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_modificacion");
-
-                    b.Property<string>("Num_Entrada")
+                    b.Property<string>("EntryCode")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("num_entrada");
 
-                    b.Property<string>("Obs_Entrada")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("obs_entrada");
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_entrada");
 
-                    b.HasKey("Cod_Entrada");
-
-                    b.HasIndex("Cod_Proveedor");
-
-                    b.ToTable("entradas", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Lote", b =>
-                {
-                    b.Property<int>("Cod_Lote")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_lote");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Lote"));
-
-                    b.Property<int>("Can_Disponible")
-                        .HasColumnType("integer")
-                        .HasColumnName("can_disponible");
-
-                    b.Property<int>("Can_Inicial")
-                        .HasColumnType("integer")
-                        .HasColumnName("can_inicial");
-
-                    b.Property<int>("Cod_Producto")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_producto");
-
-                    b.Property<bool>("Est_Registro")
+                    b.Property<bool>("IsRegistered")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_registro");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
+                    b.Property<string>("Note")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("obs_entrada");
 
-                    b.Property<DateTime?>("Fec_Modificacion")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("est_estado");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_proveedor");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fec_modificacion");
 
-                    b.Property<DateTime?>("Fec_Vencimiento")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_vencimiento");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario");
 
-                    b.Property<string>("Num_Lote")
+                    b.HasKey("EntryId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("entradas", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryDetail", b =>
+                {
+                    b.Property<int>("EntryDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_detentrada");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EntryDetailId"));
+
+                    b.Property<int>("EntryId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_entrada");
+
+                    b.Property<string>("LotCode")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)")
                         .HasColumnName("num_lote");
 
-                    b.HasKey("Cod_Lote");
-
-                    b.HasIndex("Cod_Producto");
-
-                    b.HasIndex("Fec_Vencimiento");
-
-                    b.ToTable("lotes", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.MovimientoKardex", b =>
-                {
-                    b.Property<int>("Cod_Movimiento")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_movimiento");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Movimiento"));
-
-                    b.Property<int>("Can_Movimiento")
-                        .HasColumnType("integer")
-                        .HasColumnName("can_movimiento");
-
-                    b.Property<int?>("Cod_Lote")
+                    b.Property<int>("LotId")
                         .HasColumnType("integer")
                         .HasColumnName("cod_lote");
 
-                    b.Property<int>("Cod_Producto")
+                    b.Property<int>("ProductId")
                         .HasColumnType("integer")
                         .HasColumnName("cod_producto");
 
-                    b.Property<int>("Cod_Usuario")
+                    b.Property<int>("Quantity")
                         .HasColumnType("integer")
-                        .HasColumnName("cod_usuario");
+                        .HasColumnName("can_detentrada");
 
-                    b.Property<DateTime>("Fec_Movimiento")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_movimiento");
+                    b.Property<decimal>("UnitCost")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("cos_detentrada");
 
-                    b.Property<string>("Ref_Movimiento")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("ref_movimiento");
+                    b.HasKey("EntryDetailId");
 
-                    b.Property<string>("Tip_Movimiento")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("tip_movimiento");
+                    b.HasIndex("EntryId");
 
-                    b.HasKey("Cod_Movimiento");
+                    b.HasIndex("LotId");
 
-                    b.HasIndex("Cod_Producto");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("Fec_Movimiento");
-
-                    b.ToTable("movimientos_kardex", (string)null);
+                    b.ToTable("detalles_entrada", (string)null);
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Producto", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryOrder", b =>
                 {
-                    b.Property<int>("Cod_Producto")
+                    b.Property<int>("EntryOrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("cod_producto");
+                        .HasColumnName("cod_orden");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Producto"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EntryOrderId"));
 
-                    b.Property<int>("Cod_Categoria")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<int>("CreatedByUserId")
                         .HasColumnType("integer")
-                        .HasColumnName("cod_categoria");
+                        .HasColumnName("cod_usuario_crea");
 
-                    b.Property<int>("Cod_Unidad")
+                    b.Property<int?>("EntryId")
                         .HasColumnType("integer")
-                        .HasColumnName("cod_unidad");
+                        .HasColumnName("cod_entrada");
 
-                    b.Property<string>("Des_Producto")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("des_producto");
+                    b.Property<DateTime?>("ExpectedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_esperada");
 
-                    b.Property<bool>("Est_Activo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_activo");
-
-                    b.Property<bool>("Est_Registro")
+                    b.Property<bool>("IsRegistered")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_registro");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
+                    b.Property<string>("Note")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("obs_orden");
 
-                    b.Property<DateTime?>("Fec_Modificacion")
+                    b.Property<string>("OrderCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("num_orden");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_orden");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_recepcion");
+
+                    b.Property<int?>("ReceivedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario_recibe");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("est_estado");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_proveedor");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fec_modificacion");
 
-                    b.Property<string>("Nom_Producto")
+                    b.HasKey("EntryOrderId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("EntryId");
+
+                    b.HasIndex("ReceivedByUserId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("ordenes_ingreso", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryOrderDetail", b =>
+                {
+                    b.Property<int>("EntryOrderDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_detorden");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EntryOrderDetailId"));
+
+                    b.Property<int>("EntryOrderId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_orden");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    b.Property<int>("RequestedQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_solicitada");
+
+                    b.HasKey("EntryOrderDetailId");
+
+                    b.HasIndex("EntryOrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("detalles_orden_ingreso", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Exit", b =>
+                {
+                    b.Property<int>("ExitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_salida");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExitId"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_sucursal");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<string>("ExitCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("num_salida");
+
+                    b.Property<DateTime>("ExitDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_salida");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("obs_salida");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("mot_salida");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("est_estado");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario");
+
+                    b.HasKey("ExitId");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("salidas", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.ExitDetail", b =>
+                {
+                    b.Property<int>("ExitDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_detsalida");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExitDetailId"));
+
+                    b.Property<int>("ExitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_salida");
+
+                    b.Property<string>("LotCode")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("num_lote");
+
+                    b.Property<int>("LotId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_lote");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_detsalida");
+
+                    b.HasKey("ExitDetailId");
+
+                    b.HasIndex("ExitId");
+
+                    b.HasIndex("LotId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("detalles_salida", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.KardexMovement", b =>
+                {
+                    b.Property<int>("MovementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_movimiento");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MovementId"));
+
+                    b.Property<int?>("LotId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_lote");
+
+                    b.Property<DateTime>("MovementDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_movimiento");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_movimiento");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ref_movimiento");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tip_movimiento");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario");
+
+                    b.HasKey("MovementId");
+
+                    b.HasIndex("MovementDate");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("movimientos_kardex", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Lot", b =>
+                {
+                    b.Property<int>("LotId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_lote");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LotId"));
+
+                    b.Property<int>("AvailableQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_disponible");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_vencimiento");
+
+                    b.Property<int>("InitialQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("can_inicial");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<string>("LotCode")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("num_lote");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
+
+                    b.HasKey("LotId");
+
+                    b.HasIndex("ExpirationDate");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("lotes", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Product", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_producto");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_categoria");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("des_producto");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_activo");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<int>("MinStock")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("stk_min_producto");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)")
                         .HasColumnName("nom_producto");
 
-                    b.Property<decimal>("Pre_Producto")
+                    b.Property<decimal>("Price")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(12, 2)
                         .HasColumnType("numeric(12,2)")
                         .HasDefaultValue(0m)
                         .HasColumnName("pre_producto");
 
-                    b.Property<int>("StkMin_Producto")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("stk_min_producto");
-
-                    b.Property<int>("Stk_Producto")
+                    b.Property<int>("Stock")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("stk_producto");
 
-                    b.HasKey("Cod_Producto");
+                    b.Property<int>("UnitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_unidad");
 
-                    b.HasIndex("Cod_Categoria");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
 
-                    b.HasIndex("Cod_Unidad");
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("productos", (string)null);
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Proveedor", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Supplier", b =>
                 {
-                    b.Property<int>("Cod_Proveedor")
+                    b.Property<int>("SupplierId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("cod_proveedor");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Proveedor"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SupplierId"));
 
-                    b.Property<string>("Cor_Proveedor")
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("cor_proveedor");
-
-                    b.Property<string>("Dir_Proveedor")
+                    b.Property<string>("Address")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("dir_proveedor");
 
-                    b.Property<bool>("Est_Activo")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("cor_proveedor");
+
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_activo");
 
-                    b.Property<bool>("Est_Registro")
+                    b.Property<bool>("IsRegistered")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_registro");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
-
-                    b.Property<DateTime?>("Fec_Modificacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_modificacion");
-
-                    b.Property<string>("Nom_Proveedor")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("nom_proveedor");
 
-                    b.Property<string>("Ruc_Proveedor")
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tel_proveedor");
+
+                    b.Property<string>("TaxId")
                         .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("character varying(11)")
                         .HasColumnName("ruc_proveedor");
 
-                    b.Property<string>("Tel_Proveedor")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("tel_proveedor");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
 
-                    b.HasKey("Cod_Proveedor");
+                    b.HasKey("SupplierId");
 
-                    b.HasIndex("Ruc_Proveedor")
+                    b.HasIndex("TaxId")
                         .IsUnique();
 
                     b.ToTable("proveedores", (string)null);
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Salida", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Unit", b =>
                 {
-                    b.Property<int>("Cod_Salida")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_salida");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Salida"));
-
-                    b.Property<int>("Cod_Sucursal")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_sucursal");
-
-                    b.Property<int>("Cod_Usuario")
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_usuario");
-
-                    b.Property<string>("Est_Estado")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("est_estado");
-
-                    b.Property<bool>("Est_Registro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_registro");
-
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
-
-                    b.Property<DateTime?>("Fec_Modificacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_modificacion");
-
-                    b.Property<DateTime>("Fec_Salida")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_salida");
-
-                    b.Property<string>("Mot_Salida")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("mot_salida");
-
-                    b.Property<string>("Num_Salida")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("num_salida");
-
-                    b.Property<string>("Obs_Salida")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("obs_salida");
-
-                    b.HasKey("Cod_Salida");
-
-                    b.HasIndex("Cod_Sucursal");
-
-                    b.ToTable("salidas", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Sucursal", b =>
-                {
-                    b.Property<int>("Cod_Sucursal")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_sucursal");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Sucursal"));
-
-                    b.Property<string>("Dir_Sucursal")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("dir_sucursal");
-
-                    b.Property<bool>("Est_Activo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_activo");
-
-                    b.Property<bool>("Est_Registro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_registro");
-
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
-
-                    b.Property<DateTime?>("Fec_Modificacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_modificacion");
-
-                    b.Property<string>("Nom_Sucursal")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("nom_sucursal");
-
-                    b.Property<string>("Tel_Sucursal")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("tel_sucursal");
-
-                    b.HasKey("Cod_Sucursal");
-
-                    b.ToTable("sucursales", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Unidad", b =>
-                {
-                    b.Property<int>("Cod_Unidad")
+                    b.Property<int>("UnitId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("cod_unidad");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Unidad"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UnitId"));
 
-                    b.Property<string>("Abr_Unidad")
+                    b.Property<string>("Abbreviation")
                         .IsRequired()
                         .HasMaxLength(6)
                         .HasColumnType("character varying(6)")
                         .HasColumnName("abr_unidad");
 
-                    b.Property<bool>("Est_Activo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_activo");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
 
-                    b.Property<bool>("Est_Registro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("est_registro");
-
-                    b.Property<int>("Fac_Unidad")
+                    b.Property<int>("Factor")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(1)
                         .HasColumnName("fac_unidad");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
-
-                    b.Property<DateTime?>("Fec_Modificacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_modificacion");
-
-                    b.Property<string>("Nom_Unidad")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)")
-                        .HasColumnName("nom_unidad");
-
-                    b.HasKey("Cod_Unidad");
-
-                    b.ToTable("unidades", (string)null);
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Usuario", b =>
-                {
-                    b.Property<int>("Cod_Usuario")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("cod_usuario");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cod_Usuario"));
-
-                    b.Property<string>("Cla_Usuario")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("cla_usuario");
-
-                    b.Property<bool>("Est_Acceso")
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("est_acceso");
+                        .HasColumnName("est_activo");
 
-                    b.Property<bool>("Est_Registro")
+                    b.Property<bool>("IsRegistered")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("est_registro");
 
-                    b.Property<DateTime>("Fec_Creacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fec_creacion");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("nom_unidad");
 
-                    b.Property<DateTime?>("Fec_Modificacion")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fec_modificacion");
 
-                    b.Property<string>("Nom_Usuario")
+                    b.HasKey("UnitId");
+
+                    b.ToTable("unidades", (string)null);
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_usuario");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cod_sucursal");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_creacion");
+
+                    b.Property<bool>("HasAccess")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_acceso");
+
+                    b.Property<bool>("IsRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("est_registro");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("nom_usuario");
 
-                    b.Property<string>("Rol_Usuario")
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("cla_usuario");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)")
                         .HasColumnName("rol_usuario");
 
-                    b.HasKey("Cod_Usuario");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fec_modificacion");
 
-                    b.HasIndex("Nom_Usuario")
+                    b.HasKey("UserId");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("usuarios", (string)null);
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.DetalleEntrada", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.BranchRequest", b =>
                 {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Entrada", "Entrada")
-                        .WithMany("Detalles")
-                        .HasForeignKey("Cod_Entrada")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Exit", "Exit")
+                        .WithMany()
+                        .HasForeignKey("ExitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.User", "ReceivedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReceivedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.User", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Exit");
+
+                    b.Navigation("ReceivedByUser");
+
+                    b.Navigation("RequestedByUser");
+
+                    b.Navigation("ReviewedByUser");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.BranchRequestDetail", b =>
+                {
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.BranchRequest", "BranchRequest")
+                        .WithMany("Details")
+                        .HasForeignKey("BranchRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Lote", "Lote")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("Cod_Lote")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("Cod_Producto")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("BranchRequest");
 
-                    b.Navigation("Entrada");
-
-                    b.Navigation("Lote");
-
-                    b.Navigation("Producto");
+                    b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.DetalleSalida", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entry", b =>
                 {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Lote", "Lote")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Supplier", "Supplier")
                         .WithMany()
-                        .HasForeignKey("Cod_Lote")
+                        .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("Cod_Producto")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Supplier");
+                });
 
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Salida", "Salida")
-                        .WithMany("Detalles")
-                        .HasForeignKey("Cod_Salida")
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryDetail", b =>
+                {
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Entry", "Entry")
+                        .WithMany("Details")
+                        .HasForeignKey("EntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Lote");
-
-                    b.Navigation("Producto");
-
-                    b.Navigation("Salida");
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entrada", b =>
-                {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Proveedor", "Proveedor")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Lot", "Lot")
                         .WithMany()
-                        .HasForeignKey("Cod_Proveedor")
+                        .HasForeignKey("LotId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Proveedor");
-                });
-
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Lote", b =>
-                {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Producto", "Producto")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("Cod_Producto")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Producto");
+                    b.Navigation("Entry");
+
+                    b.Navigation("Lot");
+
+                    b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Producto", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryOrder", b =>
                 {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Categoria", "Categoria")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.User", "CreatedByUser")
                         .WithMany()
-                        .HasForeignKey("Cod_Categoria")
+                        .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Unidad", "Unidad")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Entry", "Entry")
                         .WithMany()
-                        .HasForeignKey("Cod_Unidad")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.User", "ReceivedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReceivedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Categoria");
+                    b.Navigation("CreatedByUser");
 
-                    b.Navigation("Unidad");
+                    b.Navigation("Entry");
+
+                    b.Navigation("ReceivedByUser");
+
+                    b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Salida", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryOrderDetail", b =>
                 {
-                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Sucursal", "Sucursal")
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.EntryOrder", "EntryOrder")
+                        .WithMany("Details")
+                        .HasForeignKey("EntryOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("Cod_Sucursal")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Sucursal");
+                    b.Navigation("EntryOrder");
+
+                    b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entrada", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Exit", b =>
                 {
-                    b.Navigation("Detalles");
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Salida", b =>
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.ExitDetail", b =>
                 {
-                    b.Navigation("Detalles");
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Exit", "Exit")
+                        .WithMany("Details")
+                        .HasForeignKey("ExitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Lot", "Lot")
+                        .WithMany()
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Exit");
+
+                    b.Navigation("Lot");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Lot", b =>
+                {
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Product", b =>
+                {
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Unit", "Unit")
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.User", b =>
+                {
+                    b.HasOne("SistemaCandeyInventario.Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.BranchRequest", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Entry", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.EntryOrder", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("SistemaCandeyInventario.Domain.Entities.Exit", b =>
+                {
+                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }

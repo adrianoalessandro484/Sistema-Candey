@@ -13,6 +13,8 @@ import ExitsPage from './pages/ExitsPage.jsx'
 import SuppliersPage from './pages/SuppliersPage.jsx'
 import BranchesPage from './pages/BranchesPage.jsx'
 import ReportsPage from './pages/ReportsPage.jsx'
+import BranchRequestsPage from './pages/BranchRequestsPage.jsx'
+import EntryOrdersPage from './pages/EntryOrdersPage.jsx'
 import { ToastProvider } from './components/toast/ToastProvider.jsx'
 import { homePathFor } from './utils/permissions.js'
 
@@ -47,6 +49,22 @@ export default function App() {
               <Route element={<ProtectedLayout />}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route
+                  path="/requerimientos"
+                  element={
+                    <RoleRoute roles={['Administrator', 'ExitClerk', 'BranchClerk']}>
+                      <BranchRequestsPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/ordenes-ingreso"
+                  element={
+                    <RoleRoute roles={['Administrator', 'EntryClerk']}>
+                      <EntryOrdersPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
                   path="/usuarios"
                   element={
                     <RoleRoute roles={['Administrator']}>
@@ -57,7 +75,7 @@ export default function App() {
                 <Route
                   path="/productos"
                   element={
-                    <RoleRoute roles={['Administrator']}>
+                    <RoleRoute roles={['Administrator', 'EntryClerk', 'ExitClerk', 'BranchClerk']}>
                       <ProductsPage />
                     </RoleRoute>
                   }
@@ -97,7 +115,7 @@ export default function App() {
                 <Route
                   path="/proveedores"
                   element={
-                    <RoleRoute roles={['Administrator', 'ExitClerk']}>
+                    <RoleRoute roles={['Administrator', 'ExitClerk', 'EntryClerk']}>
                       <SuppliersPage />
                     </RoleRoute>
                   }

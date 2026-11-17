@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Pencil, Trash2, UserCheck, UserX, Users } from 'lucide-react'
+import { Pencil, Store, Trash2, UserCheck, UserX, Users } from 'lucide-react'
 import DataTable from '../DataTable.jsx'
 import Badge from '../Badge.jsx'
 import IconButton from '../IconButton.jsx'
@@ -40,7 +40,17 @@ export default function UsersTable({ users, currentUserId, onEdit, onToggleAcces
         id: 'role',
         header: 'Rol',
         accessorFn: (row) => row.role,
-        cell: ({ getValue }) => <RoleBadge role={getValue()} />,
+        cell: ({ row }) => (
+          <div className="flex flex-col gap-1">
+            <RoleBadge role={row.original.role} />
+            {row.original.branchName ? (
+              <span className="inline-flex items-center gap-1 text-[12px] text-muted">
+                <Store size={12} aria-hidden="true" />
+                {row.original.branchName}
+              </span>
+            ) : null}
+          </div>
+        ),
       },
       {
         id: 'access',
@@ -72,7 +82,7 @@ export default function UsersTable({ users, currentUserId, onEdit, onToggleAcces
           const isCurrent = user.id === currentUserId
 
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(user)}>
                 <Pencil size={16} />
               </IconButton>
@@ -100,7 +110,7 @@ export default function UsersTable({ users, currentUserId, onEdit, onToggleAcces
       columns={columns}
       data={users}
       loading={loading}
-      minWidth="800px"
+      minWidth="820px"
       emptyIcon={Users}
       emptyTitle="No hay usuarios"
       emptyDescription="Crea el primer usuario para dar acceso al sistema."

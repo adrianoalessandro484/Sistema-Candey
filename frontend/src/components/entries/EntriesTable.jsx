@@ -36,13 +36,13 @@ export default function EntriesTable({ entries, onView, onCancel, loading }) {
         id: 'units',
         header: 'Unidades',
         accessorFn: (row) => row.totalUnits,
-        cell: ({ getValue }) => <span className="font-medium text-ink">{getValue()}</span>,
+        cell: ({ getValue }) => <span className="font-semibold text-ink tabular-nums">{getValue()}</span>,
       },
       {
         id: 'totalCost',
         header: 'Costo total',
         accessorFn: (row) => row.totalCost,
-        cell: ({ getValue }) => <span className="text-body">{formatCurrency(getValue())}</span>,
+        cell: ({ getValue }) => <span className="font-medium text-body tabular-nums">{formatCurrency(getValue())}</span>,
       },
       {
         id: 'status',
@@ -68,7 +68,7 @@ export default function EntriesTable({ entries, onView, onCancel, loading }) {
           const isCancelled = entry.status === 'Anulada'
 
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Ver detalle" onClick={() => onView(entry)}>
                 <Eye size={16} />
               </IconButton>

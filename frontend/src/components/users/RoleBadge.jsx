@@ -6,6 +6,7 @@ export default function RoleBadge({ role }) {
     Administrator: 'candey',
     EntryClerk: 'info',
     ExitClerk: 'gold',
+    BranchClerk: 'ok',
   }
 
   return <Badge tone={tones[role] ?? 'neutral'}>{roleLabel(role)}</Badge>

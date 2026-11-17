@@ -1,12 +1,12 @@
-﻿import { useEffect, useState } from 'react'
-import { ClipboardList, Coins, PackagePlus, Plus, RotateCw } from 'lucide-react'
+﻿import { useState } from 'react'
+import { ArrowDownToLine, ClipboardList, Coins, PackagePlus, Plus } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import SearchInput from '../components/SearchInput.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
+import TableToolbar from '../components/TableToolbar.jsx'
 import Pagination from '../components/Pagination.jsx'
-import Spinner from '../components/Spinner.jsx'
 import { useToast } from '../components/toast/toastContext.js'
 import EntriesTable from '../components/entries/EntriesTable.jsx'
 import EntryFormModal from '../components/entries/EntryFormModal.jsx'
@@ -42,9 +42,15 @@ export default function EntriesPage() {
   const [confirmation, setConfirmation] = useState(CLOSED_CONFIRM)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
+  function handleSearchChange(value) {
+    setSearch(value)
     setPage(1)
-  }, [debouncedSearch, pageSize])
+  }
+
+  function handlePageSizeChange(value) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   function reload() {
     reloadAll()
@@ -81,11 +87,12 @@ export default function EntriesPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Operación"
+        icon={ArrowDownToLine}
         title="Entradas"
         description="Registra el ingreso de productos con su lote y costo."
       >
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus size={18} />
+        <Button size="lg" onClick={() => setFormOpen(true)}>
+          <Plus size={20} />
           Nueva entrada
         </Button>
       </PageHeader>
@@ -101,40 +108,24 @@ export default function EntriesPage() {
         <StatCard icon={Coins} label="Costo total" value={formatCurrency(totalCost)} tone="gold" />
       </div>
 
-      {error ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload}>
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Buscar por documento, proveedor o nota..."
-        />
-        <span className="text-[12.5px] text-muted">
-          {meta?.totalItems ?? 0} entrada(s) en total
-        </span>
-      </div>
+      <TableToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Buscar por documento, proveedor o nota..."
+        totalCount={meta?.totalItems ?? 0}
+        totalLabel="entrada(s)"
+        onRefresh={reload}
+        refreshing={fetching}
+      />
 
-      {loading && !tableLoading ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-16 text-sm text-muted">
-          <Spinner className="size-5 text-candey" />
-          Cargando entradas...
-        </div>
-      ) : (
-        <EntriesTable
-          entries={pagedEntries}
-          loading={tableLoading}
-          onView={setDetail}
-          onCancel={(entry) => setConfirmation({ open: true, entry })}
-        />
-      )}
+      <EntriesTable
+        entries={pagedEntries}
+        loading={tableLoading || (loading && pagedEntries.length === 0)}
+        onView={setDetail}
+        onCancel={(entry) => setConfirmation({ open: true, entry })}
+      />
 
       <Pagination
         page={page}
@@ -142,7 +133,7 @@ export default function EntriesPage() {
         totalItems={meta?.totalItems ?? 0}
         totalPages={meta?.totalPages ?? 0}
         onPageChange={setPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         itemLabel="entradas"
         disabled={fetching}
       />

@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
-import { Plus, RotateCw, Users } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, UserCheck, Users } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import SearchInput from '../components/SearchInput.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
+import TableToolbar from '../components/TableToolbar.jsx'
 import Pagination from '../components/Pagination.jsx'
-import Spinner from '../components/Spinner.jsx'
 import { useToast } from '../components/toast/toastContext.js'
 import { useSession } from '../context/sessionContext.js'
 import UsersTable from '../components/users/UsersTable.jsx'
 import UserFormModal from '../components/users/UserFormModal.jsx'
 import { useUsers, useUsersPage } from '../hooks/useUsers.js'
+import { useBranches } from '../hooks/useBranches.js'
 import { useDebouncedValue } from '../hooks/useDebouncedValue.js'
 import { createUser, updateUser, changeUserAccess, deleteUser } from '../services/userService.js'
 
@@ -22,6 +23,7 @@ export default function UsersPage() {
   const { notify } = useToast()
   const { user: currentUser } = useSession()
   const { users, loading, error: allError, reload: reloadAll } = useUsers()
+  const { branches } = useBranches()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
@@ -38,9 +40,15 @@ export default function UsersPage() {
   const [confirmation, setConfirmation] = useState(CLOSED_CONFIRM)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
+  function handleSearchChange(value) {
+    setSearch(value)
     setPage(1)
-  }, [debouncedSearch, pageSize])
+  }
+
+  function handlePageSizeChange(value) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   function reload() {
     reloadAll()
@@ -103,11 +111,12 @@ export default function UsersPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Administración"
+        icon={Users}
         title="Usuarios"
         description="Personal de almacén, roles y acceso al sistema."
       >
-        <Button onClick={openCreate}>
-          <Plus size={18} />
+        <Button size="lg" onClick={openCreate}>
+          <Plus size={20} />
           Nuevo usuario
         </Button>
       </PageHeader>
@@ -115,45 +124,33 @@ export default function UsersPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <StatCard icon={Users} label="Usuarios registrados" value={String(users.length)} tone="candey" />
         <StatCard
-          icon={Users}
+          icon={UserCheck}
           label="Con acceso activo"
           value={String(users.filter((user) => user.hasAccess).length)}
           tone="ok"
         />
       </div>
 
-      {error ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload}>
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput value={search} onChange={setSearch} placeholder="Buscar usuario o rol..." />
-        <span className="text-[12.5px] text-muted">
-          {meta?.totalItems ?? 0} usuario(s) en total
-        </span>
-      </div>
+      <TableToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Buscar usuario o rol..."
+        totalCount={meta?.totalItems ?? 0}
+        totalLabel="usuario(s)"
+        onRefresh={reload}
+        refreshing={fetching}
+      />
 
-      {loading && !tableLoading ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-16 text-sm text-muted">
-          <Spinner className="size-5 text-candey" />
-          Cargando usuarios...
-        </div>
-      ) : (
-        <UsersTable
-          users={pagedUsers}
-          loading={tableLoading}
-          currentUserId={currentUser?.userId}
-          onEdit={openEdit}
-          onToggleAccess={toggleAccess}
-          onDelete={(user) => setConfirmation({ open: true, user })}
-        />
-      )}
+      <UsersTable
+        users={pagedUsers}
+        loading={tableLoading || (loading && pagedUsers.length === 0)}
+        currentUserId={currentUser?.userId}
+        onEdit={openEdit}
+        onToggleAccess={toggleAccess}
+        onDelete={(user) => setConfirmation({ open: true, user })}
+      />
 
       <Pagination
         page={page}
@@ -161,7 +158,7 @@ export default function UsersPage() {
         totalItems={meta?.totalItems ?? 0}
         totalPages={meta?.totalPages ?? 0}
         onPageChange={setPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         itemLabel="usuarios"
         disabled={fetching}
       />
@@ -170,6 +167,7 @@ export default function UsersPage() {
         open={modal.open}
         mode={modal.mode}
         user={modal.user}
+        branches={branches}
         onClose={closeModal}
         onSave={saveUser}
       />

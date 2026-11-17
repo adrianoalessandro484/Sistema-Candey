@@ -40,7 +40,7 @@ export default function LoginForm({ onSuccess }) {
       <form onSubmit={handleSubmit(submit)} noValidate className="flex flex-col gap-5">
         {errors.root ? (
           <div
-            className="flex items-start gap-2.5 rounded-xl border border-danger/25 bg-danger-bg px-4 py-3 text-[14px] font-medium text-danger"
+            className="flex items-start gap-2.5 rounded-2xl border-2 border-danger/30 bg-danger-bg px-4 py-3.5 text-[14px] font-medium text-danger"
             role="alert"
           >
             <AlertCircle size={19} className="mt-px shrink-0" />
@@ -55,6 +55,7 @@ export default function LoginForm({ onSuccess }) {
           placeholder="Escribe tu usuario"
           autoComplete="username"
           autoFocus
+          controlClassName="h-[56px] text-[15.5px]"
           error={errors.userName?.message}
           {...register('userName')}
         />
@@ -66,26 +67,33 @@ export default function LoginForm({ onSuccess }) {
           type={showPassword ? 'text' : 'password'}
           placeholder="Escribe tu contraseña"
           autoComplete="current-password"
+          controlClassName="h-[56px] text-[15.5px]"
           error={errors.password?.message}
           trailing={
             <button
               type="button"
               onClick={() => setShowPassword((value) => !value)}
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-candey-50 hover:text-candey"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-muted transition-colors hover:bg-candey-50 hover:text-candey"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
             </button>
           }
           {...register('password')}
         />
 
-        <Button type="submit" size="lg" fullWidth loading={isSubmitting}>
+        <Button
+          type="submit"
+          size="lg"
+          fullWidth
+          loading={isSubmitting}
+          className="mt-1 h-[58px] text-[16.5px]"
+        >
           {isSubmitting ? (
             'Validando acceso...'
           ) : (
             <>
-              <LogIn size={19} />
+              <LogIn size={20} />
               Ingresar al sistema
             </>
           )}

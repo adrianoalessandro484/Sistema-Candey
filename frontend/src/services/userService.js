@@ -8,6 +8,8 @@ function mapUser(item) {
     userName: item.UserName,
     role: item.Role,
     hasAccess: item.HasAccess,
+    branchId: item.BranchId ?? null,
+    branchName: item.BranchName ?? null,
     createdAt: item.CreatedAt,
   }
 }
@@ -27,6 +29,7 @@ export async function createUser(user) {
     UserName: user.userName,
     Password: user.password,
     Role: user.role,
+    BranchId: user.role === 'BranchClerk' && user.branchId ? Number(user.branchId) : null,
   })
   return mapUser(response.data)
 }
@@ -36,6 +39,7 @@ export async function updateUser(id, user) {
     UserName: user.userName,
     Password: user.password,
     Role: user.role,
+    BranchId: user.role === 'BranchClerk' && user.branchId ? Number(user.branchId) : null,
   })
   return mapUser(response.data)
 }

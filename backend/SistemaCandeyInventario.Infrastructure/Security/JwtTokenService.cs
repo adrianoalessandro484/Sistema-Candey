@@ -27,6 +27,11 @@ public class JwtTokenService : ITokenService
             new(ClaimTypes.Role, user.Role.ToString())
         };
 
+        if (user.BranchId.HasValue)
+        {
+            claims.Add(new Claim("branch_id", user.BranchId.Value.ToString()));
+        }
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

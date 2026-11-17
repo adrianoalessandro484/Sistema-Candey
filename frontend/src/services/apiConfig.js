@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5042/api'
+const rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '')
+export const API_URL = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`
 
 export const SESSION_KEY = 'candey.session'
 

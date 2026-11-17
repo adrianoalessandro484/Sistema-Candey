@@ -1,12 +1,12 @@
-﻿import { useEffect, useState } from 'react'
-import { ArrowUpFromLine, Plus, RotateCw } from 'lucide-react'
+﻿import { useState } from 'react'
+import { ArrowUpFromLine, PackageCheck, Plus } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import StatCard from '../components/StatCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import SearchInput from '../components/SearchInput.jsx'
+import ErrorBanner from '../components/ErrorBanner.jsx'
+import TableToolbar from '../components/TableToolbar.jsx'
 import Pagination from '../components/Pagination.jsx'
-import Spinner from '../components/Spinner.jsx'
 import { useToast } from '../components/toast/toastContext.js'
 import ExitsTable from '../components/exits/ExitsTable.jsx'
 import ExitFormModal from '../components/exits/ExitFormModal.jsx'
@@ -41,9 +41,15 @@ export default function ExitsPage() {
   const [confirmation, setConfirmation] = useState(CLOSED_CONFIRM)
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
+  function handleSearchChange(value) {
+    setSearch(value)
     setPage(1)
-  }, [debouncedSearch, pageSize])
+  }
+
+  function handlePageSizeChange(value) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   function reload() {
     reloadAll()
@@ -79,11 +85,12 @@ export default function ExitsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         eyebrow="Operación"
+        icon={ArrowUpFromLine}
         title="Salidas"
         description="Registra despachos, mermas y muestras respetando FEFO."
       >
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus size={18} />
+        <Button size="lg" onClick={() => setFormOpen(true)}>
+          <Plus size={20} />
           Nueva salida
         </Button>
       </PageHeader>
@@ -96,45 +103,31 @@ export default function ExitsPage() {
           tone="candey"
         />
         <StatCard
-          icon={ArrowUpFromLine}
+          icon={PackageCheck}
           label="Unidades despachadas"
           value={String(totalUnits)}
           tone="info"
         />
       </div>
 
-      {error ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn/30 bg-warn-bg px-4 py-3 text-sm text-warn">
-          <span>{error}</span>
-          <Button variant="secondary" size="sm" onClick={reload}>
-            <RotateCw size={16} />
-            Reintentar
-          </Button>
-        </div>
-      ) : null}
+      <ErrorBanner message={error} onRetry={reload} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Buscar por documento, motivo o sucursal..."
-        />
-        <span className="text-[12.5px] text-muted">{meta?.totalItems ?? 0} salida(s) en total</span>
-      </div>
+      <TableToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Buscar por documento, motivo o sucursal..."
+        totalCount={meta?.totalItems ?? 0}
+        totalLabel="salida(s)"
+        onRefresh={reload}
+        refreshing={fetching}
+      />
 
-      {loading && !tableLoading ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface py-16 text-sm text-muted">
-          <Spinner className="size-5 text-candey" />
-          Cargando salidas...
-        </div>
-      ) : (
-        <ExitsTable
-          exits={pagedExits}
-          loading={tableLoading}
-          onView={setDetail}
-          onCancel={(exit) => setConfirmation({ open: true, exit })}
-        />
-      )}
+      <ExitsTable
+        exits={pagedExits}
+        loading={tableLoading || (loading && pagedExits.length === 0)}
+        onView={setDetail}
+        onCancel={(exit) => setConfirmation({ open: true, exit })}
+      />
 
       <Pagination
         page={page}
@@ -142,7 +135,7 @@ export default function ExitsPage() {
         totalItems={meta?.totalItems ?? 0}
         totalPages={meta?.totalPages ?? 0}
         onPageChange={setPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         itemLabel="salidas"
         disabled={fetching}
       />

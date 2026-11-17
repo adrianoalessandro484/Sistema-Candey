@@ -31,14 +31,3 @@ export default function Field({
     </div>
   )
 }
-
-export const controlClasses = (hasError, extra = '') =>
-  [
-    'w-full rounded-xl border bg-white text-[15px] text-ink shadow-[inset_0_1px_2px_rgba(27,20,24,0.03)] outline-none transition-all duration-150 placeholder:text-muted/65 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted',
-    hasError
-      ? 'border-danger/60 focus:border-danger focus:ring-4 focus:ring-danger/12'
-      : 'border-line-strong hover:border-candey/40 focus:border-candey focus:ring-4 focus:ring-candey/12',
-    extra,
-  ]
-    .filter(Boolean)
-    .join(' ')

@@ -109,16 +109,19 @@ export default function ExitFormModal({ open, onClose, onSave, products, branche
           />
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-ink">Productos y lotes</h3>
-              <Button variant="secondary" type="button" onClick={() => append({ ...emptyExitLine })}>
-                <Plus size={16} />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col">
+                <h3 className="text-[15px] font-bold text-ink">Productos y lotes</h3>
+                <p className="text-[12.5px] text-muted">Los lotes se ordenan por fecha de vencimiento (FEFO)</p>
+              </div>
+              <Button variant="soft" size="sm" type="button" onClick={() => append({ ...emptyExitLine })}>
+                <Plus size={18} />
                 Agregar producto
               </Button>
             </div>
 
             {typeof errors.lines?.message === 'string' ? (
-              <span className="text-xs text-danger" role="alert">
+              <span className="text-xs font-medium text-danger" role="alert">
                 {errors.lines.message}
               </span>
             ) : null}
@@ -127,23 +130,23 @@ export default function ExitFormModal({ open, onClose, onSave, products, branche
               const lots = lotsByLine[field.id] ?? []
 
               return (
-                <div key={field.id} className="rounded-xl border border-line bg-surface-2 p-3">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold tracking-wide text-muted uppercase">
-                      Producto {index + 1}
+                <div key={field.id} className="rounded-2xl border border-line bg-surface-2 p-4">
+                  <div className="mb-3.5 flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center rounded-full bg-candey-50 px-3 py-1 text-[11.5px] font-bold tracking-wide text-candey uppercase">
+                      Línea {index + 1}
                     </span>
                     <button
                       type="button"
                       onClick={() => remove(index)}
                       disabled={fields.length === 1}
-                      className="inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs text-muted transition-colors hover:border-danger hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-line-strong bg-white px-3.5 text-[13px] font-semibold text-muted transition-all hover:border-danger/50 hover:bg-danger-bg hover:text-danger active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={15} />
                       Quitar
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
                     <Select
                       id={`product-${index}`}
                       label="Producto"
@@ -195,9 +198,10 @@ export default function ExitFormModal({ open, onClose, onSave, products, branche
             })}
           </div>
 
-          <div className="flex justify-end rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm">
-            <span className="text-muted">
-              Unidades a despachar: <strong className="text-ink">{totalUnits}</strong>
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-candey/20 bg-candey-50/45 px-5 py-4 text-[14.5px]">
+            <span className="font-medium text-body">Resumen de despacho ({fields.length} línea(s))</span>
+            <span className="text-muted tabular-nums">
+              Unidades a despachar: <strong className="text-[17px] text-candey-dark">{totalUnits}</strong>
             </span>
           </div>
         </form>

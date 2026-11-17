@@ -3,6 +3,10 @@ import { API_URL } from './apiConfig.js'
 import { mapPagedResponse, pagedParams } from './pagination.js'
 
 function mapProduct(item) {
+  const stock = item.Stock ?? 0
+  const committedStock = item.CommittedStock ?? 0
+  const availableStock = item.AvailableStock ?? Math.max(stock - committedStock, 0)
+
   return {
     id: item.Id,
     name: item.Name,
@@ -12,7 +16,9 @@ function mapProduct(item) {
     unitId: item.UnitId,
     unitName: item.UnitName,
     minStock: item.MinStock,
-    stock: item.Stock,
+    stock,
+    committedStock,
+    availableStock,
     price: item.Price,
     active: item.IsActive,
   }

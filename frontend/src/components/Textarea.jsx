@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import Field, { controlClasses } from './Field.jsx'
+import Field from './Field.jsx'
+import { controlClasses } from './fieldStyles.js'
 
 const Textarea = forwardRef(function Textarea(
   {
@@ -25,7 +26,7 @@ const Textarea = forwardRef(function Textarea(
         aria-describedby={error ? `${id}-error` : undefined}
         className={controlClasses(
           Boolean(error),
-          `min-h-[104px] resize-y px-4 py-3 leading-relaxed ${controlClassName}`,
+          `min-h-[108px] resize-y px-4 py-3.5 leading-relaxed ${controlClassName}`,
         )}
         {...rest}
       />

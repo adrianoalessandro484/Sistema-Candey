@@ -48,7 +48,7 @@ export default function CategoriesTable({ categories, onEdit, onChangeStatus, on
         cell: ({ row }) => {
           const category = row.original
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(category)}>
                 <Pencil size={16} />
               </IconButton>

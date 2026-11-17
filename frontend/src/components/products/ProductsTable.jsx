@@ -6,9 +6,16 @@ import StockBadge from '../StockBadge.jsx'
 import IconButton from '../IconButton.jsx'
 import { formatCurrency } from '../../utils/format.js'
 
-export default function ProductsTable({ products, onEdit, onChangeStatus, onDelete, loading }) {
-  const columns = useMemo(
-    () => [
+export default function ProductsTable({
+  products,
+  canManage = true,
+  onEdit,
+  onChangeStatus,
+  onDelete,
+  loading,
+}) {
+  const columns = useMemo(() => {
+    const base = [
       {
         id: 'product',
         header: 'Producto',
@@ -38,26 +45,38 @@ export default function ProductsTable({ products, onEdit, onChangeStatus, onDele
       },
       {
         id: 'stock',
-        header: 'Existencias',
+        header: 'Existencias / Disponible',
         accessorFn: (row) => row.stock,
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-ink">{row.original.stock}</span>
-            <StockBadge stock={row.original.stock} minStock={row.original.minStock} />
-          </div>
-        ),
+        cell: ({ row }) => {
+          const product = row.original
+          return (
+            <div className="flex flex-col gap-1 tabular-nums">
+              <div className="flex items-center gap-2.5">
+                <span className="font-bold text-ink">{product.stock}</span>
+                <StockBadge stock={product.stock} minStock={product.minStock} />
+              </div>
+              {product.committedStock > 0 ? (
+                <span className="text-[11.5px] font-medium text-warn">
+                  Disponible para pedir: {product.availableStock} ({product.committedStock} en pedidos)
+                </span>
+              ) : (
+                <span className="text-[11.5px] text-muted">Disponible para pedir: {product.availableStock}</span>
+              )}
+            </div>
+          )
+        },
       },
       {
         id: 'minStock',
         header: 'Stock mínimo',
         accessorFn: (row) => row.minStock,
-        cell: ({ getValue }) => <span className="text-muted">{getValue()}</span>,
+        cell: ({ getValue }) => <span className="text-muted tabular-nums">{getValue()}</span>,
       },
       {
         id: 'price',
         header: 'Precio',
         accessorFn: (row) => row.price,
-        cell: ({ getValue }) => <span className="font-medium text-body">{formatCurrency(getValue())}</span>,
+        cell: ({ getValue }) => <span className="font-semibold text-body tabular-nums">{formatCurrency(getValue())}</span>,
       },
       {
         id: 'active',
@@ -74,14 +93,17 @@ export default function ProductsTable({ products, onEdit, onChangeStatus, onDele
             </Badge>
           ),
       },
-      {
+    ]
+
+    if (canManage) {
+      base.push({
         id: 'actions',
         header: 'Acciones',
         meta: { headerClassName: 'text-right', cellClassName: 'text-right' },
         cell: ({ row }) => {
           const product = row.original
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(product)}>
                 <Pencil size={16} />
               </IconButton>
@@ -98,17 +120,18 @@ export default function ProductsTable({ products, onEdit, onChangeStatus, onDele
             </div>
           )
         },
-      },
-    ],
-    [onEdit, onChangeStatus, onDelete],
-  )
+      })
+    }
+
+    return base
+  }, [canManage, onEdit, onChangeStatus, onDelete])
 
   return (
     <DataTable
       columns={columns}
       data={products}
       loading={loading}
-      minWidth="920px"
+      minWidth={canManage ? '940px' : '820px'}
       emptyIcon={Package}
       emptyTitle="No hay productos"
       emptyDescription="Crea el primer producto para comenzar a controlar tus existencias."

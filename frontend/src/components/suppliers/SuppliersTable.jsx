@@ -78,7 +78,7 @@ export default function SuppliersTable({ suppliers, onEdit, onChangeStatus, onDe
         cell: ({ row }) => {
           const supplier = row.original
           return (
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end gap-2">
               <IconButton title="Editar" onClick={() => onEdit(supplier)}>
                 <Pencil size={16} />
               </IconButton>
