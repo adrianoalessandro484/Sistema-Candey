@@ -1,10 +1,11 @@
 FROM node:20-alpine AS build
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.33.4 --activate
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --ignore-scripts
 
 COPY . .
 ARG VITE_API_URL=https://apicandeyinventario.argmstudio.com
@@ -13,7 +14,7 @@ RUN pnpm run build
 
 FROM nginx:alpine AS runtime
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /app/dist
+COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
