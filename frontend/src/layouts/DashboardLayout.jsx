@@ -29,7 +29,7 @@ const MENU = [
   {
     group: 'Resumen',
     items: [
-      { to: '/', label: 'Inicio', icon: LayoutDashboard, module: 'dashboard' },
+      { to: '/inicio', label: 'Inicio', icon: LayoutDashboard, module: 'dashboard' },
       { to: '/reportes', label: 'Reportes', icon: BarChart3, module: 'reports' },
     ],
   },
@@ -61,7 +61,7 @@ const MENU = [
 ]
 
 const PAGE_TITLES = {
-  '/': 'Inicio',
+  '/inicio': 'Inicio',
   '/requerimientos': 'Requerimientos',
   '/ordenes-ingreso': 'Órdenes de ingreso',
   '/usuarios': 'Usuarios',
@@ -102,7 +102,7 @@ export default function DashboardLayout() {
       >
         <div className="flex items-center justify-between gap-2 px-2 pt-1 pb-5">
           <Link
-            to="/"
+            to="/inicio"
             onClick={() => setIsMenuOpen(false)}
             className="flex items-center gap-3 rounded-2xl p-1 transition-opacity hover:opacity-90"
           >
@@ -191,7 +191,7 @@ export default function DashboardLayout() {
           <nav aria-label="Ubicación" className="min-w-0">
             <ol className="flex items-center gap-2 text-[14px] text-muted">
               <li>
-                <Link to="/" className="font-medium transition-colors hover:text-candey">
+                <Link to="/inicio" className="font-medium transition-colors hover:text-candey">
                   Candey
                 </Link>
               </li>

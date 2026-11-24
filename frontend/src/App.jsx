@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { SessionProvider } from './context/SessionProvider.jsx'
 import { useSession } from './context/sessionContext.js'
 import LoginPage from './pages/LoginPage.jsx'
+import LandingPage from './pages/LandingPage.jsx'
 import DashboardLayout from './layouts/DashboardLayout.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import UsersPage from './pages/UsersPage.jsx'
@@ -44,10 +45,11 @@ export default function App() {
         <ToastProvider>
           <div className="app">
             <Routes>
+              <Route path="/" element={<LandingPage />} />
               <Route path="/autenticacion" element={<LoginPage />} />
 
               <Route element={<ProtectedLayout />}>
-                <Route path="/" element={<DashboardPage />} />
+                <Route path="/inicio" element={<DashboardPage />} />
                 <Route
                   path="/requerimientos"
                   element={
@@ -139,7 +141,7 @@ export default function App() {
               </Route>
 
               <Route path="/login" element={<Navigate to="/autenticacion" replace />} />
-              <Route path="/dashboard" element={<Navigate to="/" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/inicio" replace />} />
               <Route path="/users" element={<Navigate to="/usuarios" replace />} />
               <Route path="/products" element={<Navigate to="/productos" replace />} />
               <Route path="/categories" element={<Navigate to="/categorias" replace />} />

@@ -1,5 +1,6 @@
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import {
+  ArrowLeft,
   Barcode,
   Boxes,
   ClipboardCheck,
@@ -48,7 +49,7 @@ export default function LoginPage() {
   const { user } = useSession()
 
   if (user) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/inicio" replace />
   }
 
   return (
@@ -143,6 +144,14 @@ export default function LoginPage() {
                     </span>
                   </div>
                 </div>
+
+                <Link
+                  to="/"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-line-strong bg-surface-2 px-3 py-2 text-[13px] font-semibold text-body transition-colors hover:border-candey/45 hover:bg-candey-50 hover:text-candey-dark"
+                >
+                  <ArrowLeft size={15} />
+                  Volver al inicio
+                </Link>
               </div>
 
               <h2 className="mt-1 text-[28px] leading-tight font-bold">Iniciar sesión</h2>
@@ -151,7 +160,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+            <LoginForm onSuccess={() => navigate('/inicio', { replace: true })} />
 
             <div className="mt-6 flex items-start justify-center gap-2 text-center text-[12.5px] leading-relaxed text-muted">
               <LifeBuoy size={15} className="mt-0.5 shrink-0" />

@@ -47,5 +47,5 @@ export function isAdministrator(role) {
 }
 
 export function homePathFor() {
-  return '/'
+  return '/inicio'
 }
